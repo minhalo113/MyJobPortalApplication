@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".LoginActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/background_color_for_login"
+        android:orientation = "vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0">
+
+        <ImageView
+            android:layout_width="130dp"
+            android:layout_height="130dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/circle_bg"
+            android:clipToOutline="true"
+            android:scaleType="center"
+            android:src="@drawable/download" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Login"
+            android:textSize="45sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:hint="Username"
+            android:id="@+id/usernameLogin">
+        </EditText>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height= "wrap_content"
+            android:layout_margin = "10dp"
+            android:hint = "Password"
+            android:id="@+id/passwordLogin">
+        </EditText>
+
+        <RadioGroup
+            android:id="@+id/accTypeLogin"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal"
+            android:gravity = "center"
+            android:layout_margin = "10dp"
+            >
+
+            <RadioButton
+                android:id="@+id/applicantButtonLogin"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="Applicant"
+                android:checked="true"
+                android:button="@null"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textColor="@color/text_color"
+                android:textStyle="bold"
+                android:background="@drawable/radio_button_background" />
+
+            <RadioButton
+                android:id="@+id/recuiterButtonLogin"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="Recuiter"
+                android:checked="false"
+                android:button="@null"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textColor="@color/text_color"
+                android:textStyle="bold"
+                android:background="@drawable/radio_button_background2" />
+
+        </RadioGroup>
+        <Button
+            android:id="@+id/loginButtonLogin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text = "Login"
+            android:layout_margin ="10dp"
+            android:background="@drawable/button_color_login"
+            android:gravity="center"
+            ></Button>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="or"
+            android:layout_margin ="10dp"
+            android:textSize="25sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/registrationButtonLogin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text = "Registration"
+            android:layout_margin = "10dp"
+            android:background="@drawable/button_color_login"
+            android:gravity="center"></Button>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
