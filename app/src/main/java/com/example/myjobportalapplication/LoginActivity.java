@@ -1,14 +1,22 @@
 package com.example.myjobportalapplication;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -23,10 +31,14 @@ public class LoginActivity extends AppCompatActivity {
     private RadioButton applicant;
     private boolean accType = false;
 
+    //firebase auth
+    private FirebaseAuth mAuth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        mAuth = FirebaseAuth.getInstance();
+
         loginFunction();
         colorChange();
     }
@@ -43,7 +55,27 @@ public class LoginActivity extends AppCompatActivity {
         loginBut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String mEmail = email.getText().toString();
+                String mPassword = password.getText().toString();
 
+                if(TextUtils.isEmpty(mEmail)){
+                    email.setError("Required email");
+                    return;
+                }
+                if(TextUtils.isEmpty(mPassword)){
+                    password.setError("Required password");
+                    return;
+                }
+
+                mAuth.signInWithEmailAndPassword(mEmail, mPassword).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if(task.isSuccessful()){
+                            Toast.makeText(getApplicationContext(),"Login Successful", Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(getApplicationContext(), HomeActivity.class));
+                        }
+                    }
+                });
             }
         });
         regisBut.setOnClickListener(new View.OnClickListener() {
