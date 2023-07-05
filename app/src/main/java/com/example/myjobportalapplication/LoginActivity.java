@@ -2,7 +2,11 @@ package com.example.myjobportalapplication;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -27,17 +31,26 @@ public class LoginActivity extends AppCompatActivity {
     private Button regisBut;
 
     private RadioGroup accountType;
-    private RadioButton recuiter;
+    private RadioButton recruiter;
     private RadioButton applicant;
     private boolean accType = false;
 
     //firebase auth
     private FirebaseAuth mAuth;
+    private ProgressDialog mDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        WindowInsetsControllerCompat windowInsetsCompat = new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
+        windowInsetsCompat.hide(WindowInsetsCompat.Type.statusBars());
+        windowInsetsCompat.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+
         mAuth = FirebaseAuth.getInstance();
+
+        mDialog = new ProgressDialog(this);
 
         loginFunction();
         colorChange();
@@ -67,15 +80,28 @@ public class LoginActivity extends AppCompatActivity {
                     return;
                 }
 
+                mDialog.setMessage("Processing...");
+                mDialog.show();
                 mAuth.signInWithEmailAndPassword(mEmail, mPassword).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
                             Toast.makeText(getApplicationContext(),"Login Successful", Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(getApplicationContext(), HomeActivity.class));
+                            //startActivity(new Intent(getApplicationContext(), HomeActivity.class));
+                            if(accType == false){
+                                startActivity(new Intent(getApplicationContext(), ApplicantActivity.class));
+                            }else{
+                                startActivity(new Intent(getApplicationContext(), RecruiterActivity.class));
+                            }
+                            mDialog.dismiss();
+                        }else{
+                            Toast.makeText(getApplicationContext(),"Login Failed...", Toast.LENGTH_SHORT).show();
+
+                            mDialog.dismiss();
                         }
                     }
                 });
+
             }
         });
         regisBut.setOnClickListener(new View.OnClickListener() {
@@ -87,7 +113,7 @@ public class LoginActivity extends AppCompatActivity {
         accountType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, int i) {
-                recuiter = findViewById(R.id.recuiterButtonLogin);
+                recruiter = findViewById(R.id.recruiterButtonLogin);
                 applicant = findViewById(R.id.applicantButtonLogin);
                 if(i == R.id.applicantButtonLogin){
                     accType = false;
@@ -101,12 +127,12 @@ public class LoginActivity extends AppCompatActivity {
     }
     protected void colorChange(){
         applicant = findViewById(R.id.applicantButtonLogin);
-        recuiter = findViewById(R.id.recuiterButtonLogin);
+        recruiter = findViewById(R.id.recruiterButtonLogin);
         if(accType == false){
-            recuiter.setBackground(getDrawable(R.drawable.radio_button_recuiter_background2));
+            recruiter.setBackground(getDrawable(R.drawable.radio_button_recruiter_background2));
             applicant.setBackground(getDrawable(R.drawable.radio_button_applicant_background2));
         }else{
-            recuiter.setBackground(getDrawable(R.drawable.radio_button_recuiter_background1));
+            recruiter.setBackground(getDrawable(R.drawable.radio_button_recruiter_background1));
             applicant.setBackground(getDrawable(R.drawable.radio_button_applicant_background1));
         }
     }
