@@ -2,7 +2,11 @@ package com.example.myjobportalapplication;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -28,18 +32,28 @@ public class RegistrationActivity extends AppCompatActivity {
 
     private RadioGroup btnAccType;
     private RadioButton applicantAcc;
-    private RadioButton recuiterAcc;
-
+    private RadioButton recruiterAcc;
+    //accType = false -> Applicant
+    //accType = true -> Recruiter
     boolean accType = false;
+
     //firebase auth
     private FirebaseAuth mFireAuth;
 
+    private ProgressDialog mDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
 
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        WindowInsetsControllerCompat windowInsetsCompat = new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
+        windowInsetsCompat.hide(WindowInsetsCompat.Type.statusBars());
+        windowInsetsCompat.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+
         mFireAuth = FirebaseAuth.getInstance();
+
+        mDialog = new ProgressDialog(this);
 
         Registration();
         colorChange();
@@ -69,15 +83,31 @@ public class RegistrationActivity extends AppCompatActivity {
                     passwordReg.setError("Required Password");
                     return;
                 }
+                mDialog.setMessage("Processing...");
+                mDialog.show();
                 mFireAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
                             Toast.makeText(getApplicationContext(),"Create Account Successful", Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(getApplicationContext(), HomeActivity.class));
+                            mDialog.dismiss();
+                            //startActivity(new Intent(getApplicationContext(), HomeActivity.class));
+                            if(accType == false){
+                                startActivity(new Intent(getApplicationContext(), ApplicantActivity.class));
+                            }else{
+                                startActivity(new Intent(getApplicationContext(), RecruiterActivity.class));
+                            }
+                        }else{
+                            Toast.makeText(getApplicationContext(), "Unable to Create Account", Toast.LENGTH_SHORT).show();
+                            mDialog.dismiss();
                         }
                     }
                 });
+                if(accType == false){
+                    startActivity(new Intent(getApplicationContext(), ApplicantActivity.class));
+                }else{
+                    startActivity(new Intent(getApplicationContext(), RecruiterActivity.class));
+                }
             }
         });
         btnBack.setOnClickListener(new View.OnClickListener() {
@@ -90,7 +120,7 @@ public class RegistrationActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, int i) {
                 applicantAcc = findViewById(R.id.applicantButtonRegistration);
-                recuiterAcc = findViewById(R.id.recuiterButtonRegistration);
+                recruiterAcc = findViewById(R.id.recruiterButtonRegistration);
 
                 if(i == R.id.applicantButtonRegistration){
                     accType = false;
@@ -104,12 +134,12 @@ public class RegistrationActivity extends AppCompatActivity {
     }
     protected void colorChange(){
         applicantAcc = findViewById(R.id.applicantButtonRegistration);
-        recuiterAcc = findViewById(R.id.recuiterButtonRegistration);
+        recruiterAcc = findViewById(R.id.recruiterButtonRegistration);
         if(accType == false){
-            recuiterAcc.setBackground(getDrawable(R.drawable.radio_button_recuiter_background2));
+            recruiterAcc.setBackground(getDrawable(R.drawable.radio_button_recruiter_background2));
             applicantAcc.setBackground(getDrawable(R.drawable.radio_button_applicant_background2));
         }else{
-            recuiterAcc.setBackground(getDrawable(R.drawable.radio_button_recuiter_background1));
+            recruiterAcc.setBackground(getDrawable(R.drawable.radio_button_recruiter_background1));
             applicantAcc.setBackground(getDrawable(R.drawable.radio_button_applicant_background1));
         }
     }

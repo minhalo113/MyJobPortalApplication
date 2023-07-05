@@ -7,12 +7,12 @@ import androidx.core.view.WindowInsetsControllerCompat;
 
 import android.os.Bundle;
 
-public class HomeActivity extends AppCompatActivity {
+public class ApplicantActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+        setContentView(R.layout.activity_employer);
 
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         WindowInsetsControllerCompat windowInsetsCompat = new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
