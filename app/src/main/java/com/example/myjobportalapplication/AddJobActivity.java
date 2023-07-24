@@ -49,7 +49,6 @@ public class AddJobActivity extends AppCompatActivity {
 
         mJobPost = FirebaseDatabase.getInstance().getReference().child("Job Post").child(uId);
 
-
         insertJob();
     }
 
@@ -93,7 +92,7 @@ public class AddJobActivity extends AppCompatActivity {
                 mJobPost.child(id).setValue(data);
 
                 Toast.makeText(getApplicationContext(), "Successful", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(getApplicationContext(), JobListActivity.class));
+                //startActivity(new Intent(getApplicationContext(), JobListActivity.class));
             }
 
         });
