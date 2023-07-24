@@ -4,6 +4,6 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
-    <string name = "open_drawer">Open Navigation Drawer</string>
-    <string name = "close_drawer">Close Navigation Drawer</string>
+    <string name="open_drawer">Open Navigation Drawer</string>
+    <string name="close_drawer">Close Navigation Drawer</string>
 </resources>

@@ -33,9 +33,8 @@ import kotlinx.coroutines.Job;
 public class JobListActivity extends AppCompatActivity {
     private RecyclerView mainRecyclerView;
     private DatabaseReference mainAllJobPost;
-    DrawerLayout drawerLayout;
-    NavigationView navigationView;
-    ActionBarDrawerToggle drawerToggle;
+
+    uiDrawer UIDRAWER = new uiDrawer();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,7 +45,7 @@ public class JobListActivity extends AppCompatActivity {
         windowInsetsCompat.hide(WindowInsetsCompat.Type.statusBars());
         windowInsetsCompat.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
 
-        mainAllJobPost = FirebaseDatabase.getInstance().getReference().child("Job Post");
+        mainAllJobPost = FirebaseDatabase.getInstance().getReference().child("Public database");
         mainAllJobPost.keepSynced(true);
 
         mainRecyclerView = findViewById(R.id.mainRecyclerJobPost);
@@ -57,7 +56,8 @@ public class JobListActivity extends AppCompatActivity {
         mainRecyclerView.setHasFixedSize(true);
         mainRecyclerView.setLayoutManager(layoutManager);
 
-        uiDrawer();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        UIDRAWER.myuiDrawer(this);
     }
 
     protected void onStart(){
@@ -77,6 +77,22 @@ public class JobListActivity extends AppCompatActivity {
                 holder.setJobDescription(model.getDescription());
                 holder.setSkills(model.getSkills());
                 holder.setSalary(model.getSalary());
+
+                holder.myview.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(getApplicationContext(), JobDetailActivity.class);
+
+                        intent.putExtra("title", model.getTitle());
+                        intent.putExtra("date", model.getDate());
+                        intent.putExtra("description", model.getDescription());
+                        intent.putExtra("skills", model.getSkills());
+                        intent.putExtra("salary", model.getSalary());
+
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent);
+                    }
+                });
             };
             @NonNull
             @Override
@@ -117,47 +133,12 @@ public class JobListActivity extends AppCompatActivity {
         }
     }
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(drawerToggle.onOptionsItemSelected(item)){
-            navigationView.bringToFront();
+        if(UIDRAWER != null && UIDRAWER.onOptionsItemSelected(item)){
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
-    protected void uiDrawer(){
-        drawerLayout = findViewById(R.id.drawer_menu);
-        navigationView = findViewById(R.id.nav_view);
-        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open_drawer, R.string.close_drawer);
-        drawerLayout.addDrawerListener(drawerToggle);
-        drawerToggle.syncState();
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch(item.getItemId()){
-                    case R.id.homeNavigateBar:{
-                        Toast.makeText(JobListActivity.this, "You already at Home", Toast.LENGTH_SHORT).show();
-                        break;
-                    }
-                    case R.id.profileNavigateBar:{
-                        Toast.makeText(JobListActivity.this, "Profile Selected", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(getApplicationContext(), RecruiterActivity.class));
-                        break;
-                    }
-                    case R.id.chatNavigateBar:{
-                        Toast.makeText(JobListActivity.this, "Chat Selected", Toast.LENGTH_SHORT).show();
-                        break;
-                    }
-                }
-                return false;
-            }
-        });
-    }
     public void onBackPressed(){
-        if(drawerLayout.isDrawerOpen(GravityCompat.START)){
-            drawerLayout.closeDrawer(GravityCompat.START);
-        }
-        else{
-            super.onBackPressed();
-        }
+        UIDRAWER.onBackPressed();
     }
 }

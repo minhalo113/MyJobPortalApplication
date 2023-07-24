@@ -45,9 +45,7 @@ public class RecruiterActivity extends AppCompatActivity {
     private EditText nameRecruiter;
     private RecyclerView postedJobList;
     private FloatingActionButton addJob;
-    DrawerLayout drawerLayout;
-    NavigationView navigationView;
-    ActionBarDrawerToggle drawerToggle;
+    uiDrawer UIDRAWER = new uiDrawer();
     private FirebaseAuth mAuth;
     private DatabaseReference mJobPostDatabase;
     @Override
@@ -78,7 +76,9 @@ public class RecruiterActivity extends AppCompatActivity {
         windowInsetsCompat.hide(WindowInsetsCompat.Type.statusBars());
         windowInsetsCompat.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
 
-        uiDrawer();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        UIDRAWER.myuiDrawer(this);
+
         uiRecruiter();
     }
 
@@ -87,9 +87,6 @@ public class RecruiterActivity extends AppCompatActivity {
         nameRecruiter = findViewById(R.id.nameRecruiter);
         postedJobList = findViewById(R.id.recyclerJobPost);
         addJob = findViewById(R.id.floatingActionButton);
-
-//        String jobPost[] = new String[]{"1st item","2nd item","3rd item"};
-//        ArrayAdapter<String> myAdapter = new ArrayAdapter<String>(RecruiterActivity.this, android.R.layout.simple_list_item_1, jobPost);
 
         nameRecruiter.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -180,47 +177,12 @@ public class RecruiterActivity extends AppCompatActivity {
         }
     }
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(drawerToggle.onOptionsItemSelected(item)){
-            navigationView.bringToFront();
+        if(UIDRAWER!=null && UIDRAWER.onOptionsItemSelected(item) == true){
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
-    protected void uiDrawer(){
-        drawerLayout = findViewById(R.id.drawer_menu);
-        navigationView = findViewById(R.id.nav_view);
-        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open_drawer, R.string.close_drawer);
-        drawerLayout.addDrawerListener(drawerToggle);
-        drawerToggle.syncState();
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch(item.getItemId()){
-                    case R.id.homeNavigateBar:{
-                        Toast.makeText(RecruiterActivity.this, "Home Selected", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(getApplicationContext(), JobListActivity.class));
-                        break;
-                    }
-                    case R.id.profileNavigateBar:{
-                        Toast.makeText(RecruiterActivity.this, "You already at Profile", Toast.LENGTH_SHORT).show();
-                        break;
-                    }
-                    case R.id.chatNavigateBar:{
-                        Toast.makeText(RecruiterActivity.this, "Chat Selected", Toast.LENGTH_SHORT).show();
-                        break;
-                    }
-                }
-                return false;
-            }
-        });
-    }
     public void onBackPressed(){
-        if(drawerLayout.isDrawerOpen(GravityCompat.START)){
-            drawerLayout.closeDrawer(GravityCompat.START);
-        }
-        else{
-            super.onBackPressed();
-        }
+        UIDRAWER.onBackPressed();
     }
 }
