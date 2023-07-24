@@ -33,6 +33,7 @@ public class AddJobActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private DatabaseReference mJobPost;
+    private DatabaseReference mPublicDatabase;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +50,7 @@ public class AddJobActivity extends AppCompatActivity {
 
         mJobPost = FirebaseDatabase.getInstance().getReference().child("Job Post").child(uId);
 
-
+        mPublicDatabase = FirebaseDatabase.getInstance().getReference().child("Public database");
         insertJob();
     }
 
@@ -91,9 +92,10 @@ public class AddJobActivity extends AppCompatActivity {
                 Data data = new Data(title, skills, description, salary, id, date);
 
                 mJobPost.child(id).setValue(data);
+                mPublicDatabase.child(id).setValue(data);
 
                 Toast.makeText(getApplicationContext(), "Successful", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(getApplicationContext(), JobListActivity.class));
+                finish();
             }
 
         });
