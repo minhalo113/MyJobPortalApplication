@@ -1,6 +1,9 @@
 package com.example.myjobportalapplication;
 
+import static android.content.ContentValues.TAG;
+
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
@@ -11,8 +14,11 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Instrumentation;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -30,6 +36,7 @@ import android.widget.Toast;
 import com.example.myjobportalapplication.data_Model.Data;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.api.Distribution;
@@ -38,6 +45,14 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class RecruiterActivity extends AppCompatActivity {
 
@@ -47,17 +62,17 @@ public class RecruiterActivity extends AppCompatActivity {
     private FloatingActionButton addJob;
     uiDrawer UIDRAWER = new uiDrawer();
     private FirebaseAuth mAuth;
+    private FirebaseFirestore mFStore;
     private DatabaseReference mJobPostDatabase;
+    private String uId;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recruiter);
 
         mAuth = FirebaseAuth.getInstance();
-
-        FirebaseUser mUser = mAuth.getCurrentUser();
-        assert mUser != null;
-        String uId = mUser.getUid();
+        mFStore = FirebaseFirestore.getInstance();
+        uId = mAuth.getCurrentUser().getUid();
 
         mJobPostDatabase = FirebaseDatabase.getInstance().getReference().child("Job Post").child(uId);
 
@@ -77,7 +92,7 @@ public class RecruiterActivity extends AppCompatActivity {
         windowInsetsCompat.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        UIDRAWER.myuiDrawer(this);
+        UIDRAWER.myuiDrawer(this, mAuth);
 
         uiRecruiter();
     }
@@ -88,6 +103,25 @@ public class RecruiterActivity extends AppCompatActivity {
         postedJobList = findViewById(R.id.recyclerJobPost);
         addJob = findViewById(R.id.floatingActionButton);
 
+        DocumentReference documentReference = mFStore.collection("Recruiter").document(uId);
+
+        documentReference.addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                if(value != null) {
+                    nameRecruiter.setText(value.getString("name"));
+                }else{
+                    Log.d(TAG, "Document does not exist or user doesn't have access.");
+                }
+            }
+        });
+
+        avatarImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                openFileChooser();
+            }
+        });
         nameRecruiter.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
@@ -96,6 +130,14 @@ public class RecruiterActivity extends AppCompatActivity {
                     String newName = nameRecruiter.getText().toString();
                     // Set the new name as the text value of nameRecruiter
                     nameRecruiter.setText(newName);
+                    Map<String, Object> user = new HashMap<>();
+                    user.put("name", newName);
+                    documentReference.update(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void unused) {
+                            Log.d(TAG, "Name created for " + uId);
+                        }
+                    });
                     // Clear the focus to dismiss the keyboard
                     nameRecruiter.clearFocus();
                     System.out.println(nameRecruiter.getText());
@@ -185,4 +227,9 @@ public class RecruiterActivity extends AppCompatActivity {
     public void onBackPressed(){
         UIDRAWER.onBackPressed();
     }
+
+//    private openFileChooser(){
+//        Intent intent = new Intent(MediaStore.ACTION_PICK_IMAGES);
+//        startActivityForResult(intent, PHOTO_PICKER_REQUEST_CODE);
+//    }
 }

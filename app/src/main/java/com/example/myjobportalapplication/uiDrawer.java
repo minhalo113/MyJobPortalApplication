@@ -12,13 +12,14 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class uiDrawer extends AppCompatActivity {
 
     DrawerLayout drawerLayout;
     NavigationView navigationView;
     ActionBarDrawerToggle drawerToggle;
-    public void myuiDrawer(Activity activity) {
+    public void myuiDrawer(Activity activity, FirebaseAuth mAuth) {
         drawerLayout = activity.findViewById(R.id.drawer_menu);
         navigationView = activity.findViewById(R.id.nav_view);
         drawerToggle = new ActionBarDrawerToggle(activity, drawerLayout, R.string.open_drawer, R.string.close_drawer);
@@ -57,6 +58,10 @@ public class uiDrawer extends AppCompatActivity {
                     }
                     case R.id.logoutNavigateBar:{
                         Toast.makeText(activity, "Logged Out", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(activity.getApplicationContext(), LoginActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        activity.startActivity(intent);
+                        mAuth.signOut();
                         break;
                     }
                 }

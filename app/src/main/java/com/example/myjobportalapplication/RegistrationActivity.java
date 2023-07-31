@@ -94,8 +94,10 @@ public class RegistrationActivity extends AppCompatActivity {
                             //startActivity(new Intent(getApplicationContext(), HomeActivity.class));
                             if(accType == false){
                                 startActivity(new Intent(getApplicationContext(), ApplicantActivity.class));
+                                finish();
                             }else{
                                 startActivity(new Intent(getApplicationContext(), RecruiterActivity.class));
+                                finish();
                             }
                         }else{
                             Toast.makeText(getApplicationContext(), "Unable to Create Account", Toast.LENGTH_SHORT).show();
@@ -103,17 +105,12 @@ public class RegistrationActivity extends AppCompatActivity {
                         }
                     }
                 });
-                if(accType == false){
-                    startActivity(new Intent(getApplicationContext(), ApplicantActivity.class));
-                }else{
-                    startActivity(new Intent(getApplicationContext(), RecruiterActivity.class));
-                }
             }
         });
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                finish();
             }
         });
         btnAccType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {

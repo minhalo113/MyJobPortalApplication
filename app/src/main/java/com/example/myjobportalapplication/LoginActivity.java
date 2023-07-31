@@ -1,5 +1,7 @@
 package com.example.myjobportalapplication;
 
+import static android.content.ContentValues.TAG;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowCompat;
@@ -10,6 +12,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,9 +21,15 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -38,6 +47,8 @@ public class LoginActivity extends AppCompatActivity {
     //firebase auth
     private FirebaseAuth mAuth;
     private ProgressDialog mDialog;
+    private FirebaseFirestore mFStore;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +60,11 @@ public class LoginActivity extends AppCompatActivity {
         windowInsetsCompat.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
 
         mAuth = FirebaseAuth.getInstance();
+        mFStore = FirebaseFirestore.getInstance();
+
+//        if (mAuth.getCurrentUser() != null){
+//            startActivity(new Intent(getApplicationContext(), HomeActivity.class));
+//        }
 
         mDialog = new ProgressDialog(this);
 
@@ -88,14 +104,28 @@ public class LoginActivity extends AppCompatActivity {
                         if(task.isSuccessful()){
                             Toast.makeText(getApplicationContext(),"Login Successful", Toast.LENGTH_SHORT).show();
                             if(accType == false){
+                                //DocumentReference documentReference = mFStore.collection()
                                 startActivity(new Intent(getApplicationContext(), ApplicantActivity.class));
+                                finish();
                             }else{
+                                String userID = mAuth.getCurrentUser().getUid();
+                                DocumentReference documentReference = mFStore.collection("Recruiter").document(userID);
+                                Map<String, Object> user = new HashMap<>();
+                                user.put("email", mEmail);
+                                user.put("password", mPassword);
+                                documentReference.update(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        Log.d(TAG, "User Profile created for " + userID);
+                                    }
+                                });
+
                                 startActivity(new Intent(getApplicationContext(), RecruiterActivity.class));
+                                finish();
                             }
                             mDialog.dismiss();
                         }else{
                             Toast.makeText(getApplicationContext(),"Login Failed...", Toast.LENGTH_SHORT).show();
-
                             mDialog.dismiss();
                         }
                     }
