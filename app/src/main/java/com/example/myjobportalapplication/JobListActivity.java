@@ -24,6 +24,7 @@ import com.example.myjobportalapplication.data_Model.Data;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
@@ -33,7 +34,7 @@ import kotlinx.coroutines.Job;
 public class JobListActivity extends AppCompatActivity {
     private RecyclerView mainRecyclerView;
     private DatabaseReference mainAllJobPost;
-
+    private FirebaseAuth mAuth;
     uiDrawer UIDRAWER = new uiDrawer();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +49,8 @@ public class JobListActivity extends AppCompatActivity {
         mainAllJobPost = FirebaseDatabase.getInstance().getReference().child("Public database");
         mainAllJobPost.keepSynced(true);
 
+        mAuth = FirebaseAuth.getInstance();
+
         mainRecyclerView = findViewById(R.id.mainRecyclerJobPost);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setReverseLayout(true);
@@ -57,7 +60,7 @@ public class JobListActivity extends AppCompatActivity {
         mainRecyclerView.setLayoutManager(layoutManager);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        UIDRAWER.myuiDrawer(this);
+        UIDRAWER.myuiDrawer(this, mAuth);
     }
 
     protected void onStart(){
