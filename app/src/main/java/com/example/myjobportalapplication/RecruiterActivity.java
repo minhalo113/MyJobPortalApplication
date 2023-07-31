@@ -2,6 +2,9 @@ package com.example.myjobportalapplication;
 
 import static android.content.ContentValues.TAG;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -16,6 +19,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Instrumentation;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -36,6 +42,7 @@ import android.widget.Toast;
 import com.example.myjobportalapplication.data_Model.Data;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
@@ -50,7 +57,12 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,8 +76,31 @@ public class RecruiterActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseFirestore mFStore;
     private DatabaseReference mJobPostDatabase;
+    private StorageReference mStorage;
     private String uId;
-    @Override
+
+    ActivityResultLauncher<String> mGetContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
+            new ActivityResultCallback<Uri>() {
+                @Override
+                public void onActivityResult(Uri uri) {
+                    // Handle the returned Uri
+                    if(uri != null){
+                        try{
+                            Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),uri);
+
+                            int desiredWidth = avatarImage.getWidth();
+                            int desiredHeight = avatarImage.getHeight();
+
+                            Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, desiredWidth, desiredHeight, true);
+
+                            avatarImage.setImageBitmap(scaledBitmap);
+                            uploadFile(bitmap);
+                        }catch (IOException e){
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recruiter);
@@ -75,6 +110,7 @@ public class RecruiterActivity extends AppCompatActivity {
         uId = mAuth.getCurrentUser().getUid();
 
         mJobPostDatabase = FirebaseDatabase.getInstance().getReference().child("Job Post").child(uId);
+        mStorage = FirebaseStorage.getInstance().getReference().child("avatarImage" + uId);
 
         postedJobList = findViewById(R.id.recyclerJobPost);
 
@@ -90,6 +126,7 @@ public class RecruiterActivity extends AppCompatActivity {
         WindowInsetsControllerCompat windowInsetsCompat = new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
         windowInsetsCompat.hide(WindowInsetsCompat.Type.statusBars());
         windowInsetsCompat.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         UIDRAWER.myuiDrawer(this, mAuth);
@@ -116,10 +153,27 @@ public class RecruiterActivity extends AppCompatActivity {
             }
         });
 
+        //load avatar Images from database when user just log in
+        final long ONE_MEGABYTE = 1024 * 1024;
+        mStorage.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                Bitmap bitmap =BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+
+                int desiredWidth = avatarImage.getWidth();
+                int desiredHeight = avatarImage.getHeight();
+
+                Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, desiredWidth, desiredHeight, true);
+
+                avatarImage.setImageBitmap(scaledBitmap);
+            }
+        });
+
+        //handle when user press the avatar Image button
         avatarImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                openFileChooser();
+                openFileChooser();
             }
         });
         nameRecruiter.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -227,9 +281,24 @@ public class RecruiterActivity extends AppCompatActivity {
     public void onBackPressed(){
         UIDRAWER.onBackPressed();
     }
+    private void openFileChooser(){
+        mGetContent.launch("image/*");
+    }
+    private void uploadFile(Bitmap mImage){
+        if(mImage != null){
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            mImage.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            byte[] data = baos.toByteArray();
 
-//    private openFileChooser(){
-//        Intent intent = new Intent(MediaStore.ACTION_PICK_IMAGES);
-//        startActivityForResult(intent, PHOTO_PICKER_REQUEST_CODE);
-//    }
+            UploadTask uploadTask = mStorage.putBytes(data);
+            uploadTask.addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.d(TAG, "Image failed to upload.");
+                }
+            });
+        }else{
+            Toast.makeText(this, "No Image selected", Toast.LENGTH_SHORT).show();
+        }
+    }
 }
