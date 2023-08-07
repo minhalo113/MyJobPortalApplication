@@ -1,4 +1,4 @@
-package com.example.myjobportalapplication;
+package com.example.myjobportalapplication.EmployerPart;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowCompat;
@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.myjobportalapplication.R;
 import com.example.myjobportalapplication.data_Model.Data;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;

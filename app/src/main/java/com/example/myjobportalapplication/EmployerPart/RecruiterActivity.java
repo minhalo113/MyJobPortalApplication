@@ -1,4 +1,4 @@
-package com.example.myjobportalapplication;
+package com.example.myjobportalapplication.EmployerPart;
 
 import static android.content.ContentValues.TAG;
 
@@ -7,17 +7,13 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.GravityCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.Instrumentation;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -31,24 +27,21 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.myjobportalapplication.JobDetailActivity;
+import com.example.myjobportalapplication.R;
 import com.example.myjobportalapplication.data_Model.Data;
+import com.example.myjobportalapplication.uiDrawer.uiDrawer;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.navigation.NavigationView;
-import com.google.api.Distribution;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
@@ -192,8 +185,6 @@ public class RecruiterActivity extends AppCompatActivity {
                             Log.d(TAG, "Name created for " + uId);
                         }
                     });
-                    // Clear the focus to dismiss the keyboard
-                    nameRecruiter.clearFocus();
                     System.out.println(nameRecruiter.getText());
                     return true;
                 }
@@ -207,6 +198,7 @@ public class RecruiterActivity extends AppCompatActivity {
                 startActivity(new Intent(getApplicationContext(), AddJobActivity.class));
             }
         });
+
     }
     protected void onStart() {
         super.onStart();
@@ -227,6 +219,21 @@ public class RecruiterActivity extends AppCompatActivity {
                 holder.setJobSkills(model.getSkills());
                 holder.setSalary(model.getSalary());
 
+                holder.myView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(getApplicationContext(), JobDetailActivity.class);
+
+                        intent.putExtra("title", model.getTitle());
+                        intent.putExtra("date", model.getDate());
+                        intent.putExtra("description", model.getDescription());
+                        intent.putExtra("skills", model.getSkills());
+                        intent.putExtra("salary", model.getSalary());
+
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent);
+                    }
+                });
             };
 
             @NonNull

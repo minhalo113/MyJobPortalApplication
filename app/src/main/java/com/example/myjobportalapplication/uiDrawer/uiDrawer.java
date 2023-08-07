@@ -1,4 +1,4 @@
-package com.example.myjobportalapplication;
+package com.example.myjobportalapplication.uiDrawer;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -11,6 +11,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.example.myjobportalapplication.ChatActivity;
+import com.example.myjobportalapplication.JobListActivity;
+import com.example.myjobportalapplication.LoginRegistration.LoginActivity;
+import com.example.myjobportalapplication.R;
+import com.example.myjobportalapplication.EmployerPart.RecruiterActivity;
+import com.example.myjobportalapplication.Settings.Settings;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -54,6 +60,13 @@ public class uiDrawer extends AppCompatActivity {
                     }
                     case R.id.chatNavigateBar: {
                         Toast.makeText(activity, "Chat Selected", Toast.LENGTH_SHORT).show();
+                        break;
+                    }
+                    case  R.id.settingsNavigateBar:{
+                        Toast.makeText(activity, "Settings Selected", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(activity.getApplicationContext(), Settings.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        activity.startActivity(intent);
                         break;
                     }
                     case R.id.logoutNavigateBar:{

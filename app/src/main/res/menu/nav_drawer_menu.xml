@@ -9,7 +9,11 @@
     <item android:title="Chat"
         android:icon="@drawable/baseline_chat_24"
         android:id = "@+id/chatNavigateBar"/>
+    <item android:title = "Settings"
+        android:icon="@drawable/baseline_settings_24"
+        android:id="@+id/settingsNavigateBar"></item>
     <item android:title = "Log Out"
         android:icon="@drawable/baseline_logout_24"
         android:id="@+id/logoutNavigateBar"/>
+
 </menu>
