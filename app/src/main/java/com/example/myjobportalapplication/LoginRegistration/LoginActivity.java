@@ -1,4 +1,4 @@
-package com.example.myjobportalapplication;
+package com.example.myjobportalapplication.LoginRegistration;
 
 import static android.content.ContentValues.TAG;
 
@@ -20,6 +20,9 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.example.myjobportalapplication.EmployerPart.RecruiterActivity;
+import com.example.myjobportalapplication.JobSeekerPart.ApplicantActivity;
+import com.example.myjobportalapplication.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -136,7 +139,7 @@ public class LoginActivity extends AppCompatActivity {
         regisBut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(),RegistrationActivity.class));
+                startActivity(new Intent(getApplicationContext(), RegistrationActivity.class));
             }
         });
         accountType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
