@@ -29,13 +29,15 @@ public class JobListActivity extends AppCompatActivity {
     private RecyclerView mainRecyclerView;
     private DatabaseReference mainAllJobPost;
     private FirebaseAuth mAuth;
+
+    private String uId;
     uiDrawer UIDRAWER = new uiDrawer();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_job_list);
 
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
         WindowInsetsControllerCompat windowInsetsCompat = new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
         windowInsetsCompat.hide(WindowInsetsCompat.Type.statusBars());
         windowInsetsCompat.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
@@ -44,6 +46,7 @@ public class JobListActivity extends AppCompatActivity {
         mainAllJobPost.keepSynced(true);
 
         mAuth = FirebaseAuth.getInstance();
+        uId = mAuth.getCurrentUser().getUid();
 
         mainRecyclerView = findViewById(R.id.mainRecyclerJobPost);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -74,7 +77,7 @@ public class JobListActivity extends AppCompatActivity {
                 holder.setJobDescription(model.getDescription());
                 holder.setSkills(model.getSkills());
                 holder.setSalary(model.getSalary());
-
+                String userID = model.getUserID();
                 holder.myview.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -85,6 +88,13 @@ public class JobListActivity extends AppCompatActivity {
                         intent.putExtra("description", model.getDescription());
                         intent.putExtra("skills", model.getSkills());
                         intent.putExtra("salary", model.getSalary());
+                        intent.putExtra("job id", model.getId());
+                        intent.putExtra("user id", model.getUserID());
+                        if(userID.equals(uId)){
+                            intent.putExtra("able to delete?", 1);
+                        }else{
+                            intent.putExtra("able to delete?", 0);
+                        }
 
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(intent);

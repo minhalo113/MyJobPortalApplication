@@ -10,4 +10,6 @@
     <color name="selected_background">#B4363644</color>
     <color name="unselected_background">#2A363644</color>
     <color name="text_color">#070707</color>
+    <color name="redColor">#FF0000</color>
+    <color name="whiteColor">#FFFFFF</color>
 </resources>
