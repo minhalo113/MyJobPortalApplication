@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -35,23 +36,27 @@ public class AddJobActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private DatabaseReference mJobPost;
     private DatabaseReference mPublicDatabase;
+
+    private String uId;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_job_activity);
 
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
         WindowInsetsControllerCompat windowInsetsCompat = new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
         windowInsetsCompat.hide(WindowInsetsCompat.Type.statusBars());
         windowInsetsCompat.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser mUser = mAuth.getCurrentUser();
-        String uId = mUser.getUid();
+        uId = mUser.getUid();
 
         mJobPost = FirebaseDatabase.getInstance().getReference().child("Job Post").child(uId);
-
         mPublicDatabase = FirebaseDatabase.getInstance().getReference().child("Public database");
+
         insertJob();
     }
 
@@ -90,7 +95,7 @@ public class AddJobActivity extends AppCompatActivity {
 
                 String date = DateFormat.getDateInstance().format(new Date());
 
-                Data data = new Data(title, skills, description, salary, id, date);
+                Data data = new Data(title, skills, description, salary, id, date, uId);
 
                 mJobPost.child(id).setValue(data);
                 mPublicDatabase.child(id).setValue(data);
@@ -101,5 +106,9 @@ public class AddJobActivity extends AppCompatActivity {
 
         });
 
+    }
+    public boolean onOptionsItemSelected(MenuItem item) {
+        finish();
+        return super.onOptionsItemSelected(item);
     }
 }

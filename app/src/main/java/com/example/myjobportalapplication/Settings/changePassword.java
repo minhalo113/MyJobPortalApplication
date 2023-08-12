@@ -61,7 +61,7 @@ public class changePassword extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change_password);
 
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
         WindowInsetsControllerCompat windowInsetsCompat = new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
         windowInsetsCompat.hide(WindowInsetsCompat.Type.statusBars());
         windowInsetsCompat.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
@@ -119,6 +119,8 @@ public class changePassword extends AppCompatActivity {
 
                     currentPass.setText("");
                     newPass.setText("");
+
+                    Toast.makeText(getApplicationContext(), "Password changed successfully", Toast.LENGTH_SHORT).show();
                 }
                 else{
                     myTextView.setVisibility(View.VISIBLE);

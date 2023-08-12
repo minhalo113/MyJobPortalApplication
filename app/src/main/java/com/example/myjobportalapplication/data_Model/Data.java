@@ -7,18 +7,19 @@ public class Data {
     String salary;
     String id;
     String date;
-
+    String userID;
     public Data(){
 
     }
 
-    public Data(String title, String skills, String description, String salary, String id, String date) {
+    public Data(String title, String skills, String description, String salary, String id, String date, String userID) {
         this.title = title;
         this.description = description;
         this.skills = skills;
         this.salary = salary;
         this.id = id;
         this.date = date;
+        this.userID = userID;
     }
 
     public String getTitle() {
@@ -68,5 +69,10 @@ public class Data {
     public void setDate(String date) {
         this.date = date;
     }
-
+    public String getUserID() {
+        return userID;
+    }
+    public void setUserID(String userID) {
+        this.userID = userID;
+    }
 }

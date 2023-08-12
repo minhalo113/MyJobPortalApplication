@@ -12,10 +12,11 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.myjobportalapplication.ChatActivity;
+import com.example.myjobportalapplication.EmployerPart.RecruiterProfile;
 import com.example.myjobportalapplication.JobListActivity;
 import com.example.myjobportalapplication.LoginRegistration.LoginActivity;
 import com.example.myjobportalapplication.R;
-import com.example.myjobportalapplication.EmployerPart.RecruiterActivity;
+import com.example.myjobportalapplication.EmployerPart.RecruiterJobList;
 import com.example.myjobportalapplication.Settings.Settings;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -37,26 +38,18 @@ public class uiDrawer extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.jobpostNavigateBar: {
-                        if (activity instanceof RecruiterActivity || activity instanceof ChatActivity) {
-                            Toast.makeText(activity, "Job Post Selected", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(activity, "Job Listings Selected", Toast.LENGTH_SHORT).show();
                             Intent intent = new Intent(activity.getApplicationContext(), JobListActivity.class);
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             activity.startActivity(intent);
                             break;
-                        }else{
-                            Toast.makeText(activity, "You already at Job Post", Toast.LENGTH_SHORT).show();
-                        }
                     }
                     case R.id.profileNavigateBar: {
-                        if (activity instanceof JobListActivity || activity instanceof ChatActivity) {
                             Toast.makeText(activity, "Profile Selected", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(activity.getApplicationContext(), RecruiterActivity.class);
+                            Intent intent = new Intent(activity.getApplicationContext(), RecruiterProfile.class);
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             activity.startActivity(intent);
                             break;
-                        }else{
-                            Toast.makeText(activity, "You already at Profile", Toast.LENGTH_SHORT).show();
-                        }
                     }
                     case R.id.chatNavigateBar: {
                         Toast.makeText(activity, "Chat Selected", Toast.LENGTH_SHORT).show();
@@ -65,6 +58,13 @@ public class uiDrawer extends AppCompatActivity {
                     case  R.id.settingsNavigateBar:{
                         Toast.makeText(activity, "Settings Selected", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(activity.getApplicationContext(), Settings.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        activity.startActivity(intent);
+                        break;
+                    }
+                    case R.id.jobManageNavigateBar:{
+                        Toast.makeText(activity, "My Job Management Selected", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(activity.getApplicationContext(), RecruiterJobList.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         activity.startActivity(intent);
                         break;

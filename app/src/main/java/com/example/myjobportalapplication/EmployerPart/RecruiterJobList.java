@@ -59,51 +59,22 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RecruiterActivity extends AppCompatActivity {
-
-    private ImageButton avatarImage;
-    private EditText nameRecruiter;
+public class RecruiterJobList extends AppCompatActivity {
     private RecyclerView postedJobList;
     private FloatingActionButton addJob;
     uiDrawer UIDRAWER = new uiDrawer();
     private FirebaseAuth mAuth;
-    private FirebaseFirestore mFStore;
     private DatabaseReference mJobPostDatabase;
-    private StorageReference mStorage;
     private String uId;
 
-    ActivityResultLauncher<String> mGetContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
-            new ActivityResultCallback<Uri>() {
-                @Override
-                public void onActivityResult(Uri uri) {
-                    // Handle the returned Uri
-                    if(uri != null){
-                        try{
-                            Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),uri);
-
-                            int desiredWidth = avatarImage.getWidth();
-                            int desiredHeight = avatarImage.getHeight();
-
-                            Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, desiredWidth, desiredHeight, true);
-
-                            avatarImage.setImageBitmap(scaledBitmap);
-                            uploadFile(bitmap);
-                        }catch (IOException e){
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            });
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_recruiter);
+        setContentView(R.layout.activity_recruiter_job_list);
 
         mAuth = FirebaseAuth.getInstance();
-        mFStore = FirebaseFirestore.getInstance();
         uId = mAuth.getCurrentUser().getUid();
 
         mJobPostDatabase = FirebaseDatabase.getInstance().getReference().child("Job Post").child(uId);
-        mStorage = FirebaseStorage.getInstance().getReference().child("avatarImage" + uId);
 
         postedJobList = findViewById(R.id.recyclerJobPost);
 
@@ -115,82 +86,20 @@ public class RecruiterActivity extends AppCompatActivity {
         postedJobList.setHasFixedSize(true);
         postedJobList.setLayoutManager(layoutManager);
 
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
         WindowInsetsControllerCompat windowInsetsCompat = new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
         windowInsetsCompat.hide(WindowInsetsCompat.Type.statusBars());
         windowInsetsCompat.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
 
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        UIDRAWER.myuiDrawer(this, mAuth);
 
+        UIDRAWER.myuiDrawer(this, mAuth);
         uiRecruiter();
     }
 
     protected void uiRecruiter(){
-        avatarImage = findViewById(R.id.avatarImageButton);
-        nameRecruiter = findViewById(R.id.nameRecruiter);
         postedJobList = findViewById(R.id.recyclerJobPost);
         addJob = findViewById(R.id.floatingActionButton);
-
-        DocumentReference documentReference = mFStore.collection("Recruiter").document(uId);
-
-        documentReference.addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
-                if(value != null) {
-                    nameRecruiter.setText(value.getString("name"));
-                }else{
-                    Log.d(TAG, "Document does not exist or user doesn't have access.");
-                }
-            }
-        });
-
-        //load avatar Images from database when user just log in
-        final long ONE_MEGABYTE = 1024 * 1024;
-        mStorage.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-            @Override
-            public void onSuccess(byte[] bytes) {
-                Bitmap bitmap =BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-
-                int desiredWidth = avatarImage.getWidth();
-                int desiredHeight = avatarImage.getHeight();
-
-                Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, desiredWidth, desiredHeight, true);
-
-                avatarImage.setImageBitmap(scaledBitmap);
-            }
-        });
-
-        //handle when user press the avatar Image button
-        avatarImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                openFileChooser();
-            }
-        });
-        nameRecruiter.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE|| (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
-                    // Retrieve the entered name
-                    String newName = nameRecruiter.getText().toString();
-                    // Set the new name as the text value of nameRecruiter
-                    nameRecruiter.setText(newName);
-                    Map<String, Object> user = new HashMap<>();
-                    user.put("name", newName);
-                    documentReference.update(user).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void unused) {
-                            Log.d(TAG, "Name created for " + uId);
-                        }
-                    });
-                    System.out.println(nameRecruiter.getText());
-                    return true;
-                }
-                return false;
-            }
-        });
 
         addJob.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -229,6 +138,9 @@ public class RecruiterActivity extends AppCompatActivity {
                         intent.putExtra("description", model.getDescription());
                         intent.putExtra("skills", model.getSkills());
                         intent.putExtra("salary", model.getSalary());
+                        intent.putExtra("job id", model.getId());
+                        intent.putExtra("user id", model.getUserID());
+                        intent.putExtra("able to delete?", 1);
 
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(intent);
@@ -287,25 +199,5 @@ public class RecruiterActivity extends AppCompatActivity {
     }
     public void onBackPressed(){
         UIDRAWER.onBackPressed();
-    }
-    private void openFileChooser(){
-        mGetContent.launch("image/*");
-    }
-    private void uploadFile(Bitmap mImage){
-        if(mImage != null){
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            mImage.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-            byte[] data = baos.toByteArray();
-
-            UploadTask uploadTask = mStorage.putBytes(data);
-            uploadTask.addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.d(TAG, "Image failed to upload.");
-                }
-            });
-        }else{
-            Toast.makeText(this, "No Image selected", Toast.LENGTH_SHORT).show();
-        }
     }
 }

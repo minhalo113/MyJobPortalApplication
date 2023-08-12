@@ -1,65 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".JobDetailActivity">
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".JobDetailActivity">
 
-    <TextView
-        android:layout_width = "match_parent"
-        android:layout_height = "wrap_content"
-        android:layout_margin = "5dp"
-        android:padding = "5dp"
-        android:textAppearance = "?android:textAppearanceLarge"
-        android:textColor = "@android:color/black"
-        android:text = "Job Title"
-        android:id = "@+id/job_details_title"></TextView>
-
-    <TextView
+    <LinearLayout
+        android:id="@+id/linearLayout3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:padding = "5dp"
-        android:text = "date"
-        android:textAppearance="?android:textAppearanceSmall"
-        android:textColor = "#00FF00"
-        android:id = "@+id/job_details_date"
-        ></TextView>
+        android:orientation="vertical">
 
         <TextView
+            android:id="@+id/job_details_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
-            android:padding = "5dp"
-            android:text="Description"
-            android:textAppearance = "?android:textAppearanceMedium"
-            android:textColor="@android:color/black"
+            android:padding="5dp"
+            android:text="Job Title"
+            android:textAppearance="?android:textAppearanceLarge"
+            android:textColor="@android:color/black"></TextView>
+
+        <TextView
+            android:id="@+id/job_details_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:padding="5dp"
+            android:text="date"
+            android:textAppearance="?android:textAppearanceSmall"
+            android:textColor="#00FF00"></TextView>
+
+        <TextView
             android:id="@+id/job_details_description"
-            ></TextView>
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:padding="5dp"
+            android:text="Description"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:textColor="@android:color/black"></TextView>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:padding = "5dp"
-        android:text="Skills"
-        android:textAppearance = "?android:textAppearanceMedium"
-        android:textColor="@android:color/black"
-        android:id="@+id/job_details_skills"
-        ></TextView>
+        <TextView
+            android:id="@+id/job_details_skills"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:padding="5dp"
+            android:text="Skills"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:textColor="@android:color/black"></TextView>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:padding = "5dp"
-        android:text="Salary"
-        android:textAppearance = "?android:textAppearanceMedium"
-        android:textColor="@android:color/black"
-        android:id="@+id/job_details_salary"
-        ></TextView>
+        <TextView
+            android:id="@+id/job_details_salary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:padding="5dp"
+            android:text="Salary"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:textColor="@android:color/black"></TextView>
 
+        <Button
+            android:id="@+id/deleteButton"
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:layout_margin="10dp"
+            android:background="@color/redColor"
+            android:text="Delete"
+            android:textColor="@color/whiteColor" />
+    </LinearLayout>
 
-</LinearLayout>
+    <Button
+        android:id="@+id/contactButton"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_margin="10dp"
+        android:background="@drawable/contactbutton"
+        android:gravity="center"
+        android:text="Contact"
+        android:textColor="@color/whiteColor"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.948"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout3"
+        app:layout_constraintVertical_bias="0.884" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

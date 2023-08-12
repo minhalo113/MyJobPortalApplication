@@ -17,13 +17,19 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
-import com.example.myjobportalapplication.EmployerPart.RecruiterActivity;
+import com.example.myjobportalapplication.EmployerPart.RecruiterJobList;
+import com.example.myjobportalapplication.EmployerPart.RecruiterProfile;
 import com.example.myjobportalapplication.JobSeekerPart.ApplicantActivity;
 import com.example.myjobportalapplication.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class RegistrationActivity extends AppCompatActivity {
 
@@ -42,20 +48,21 @@ public class RegistrationActivity extends AppCompatActivity {
 
     //firebase auth
     private FirebaseAuth mFireAuth;
-
+    private FirebaseFirestore mFirestore;
     private ProgressDialog mDialog;
+    private String myUid;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
 
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
         WindowInsetsControllerCompat windowInsetsCompat = new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
         windowInsetsCompat.hide(WindowInsetsCompat.Type.statusBars());
         windowInsetsCompat.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
 
         mFireAuth = FirebaseAuth.getInstance();
-
+        mFirestore = FirebaseFirestore.getInstance();
         mDialog = new ProgressDialog(this);
 
         Registration();
@@ -99,7 +106,18 @@ public class RegistrationActivity extends AppCompatActivity {
                                 startActivity(new Intent(getApplicationContext(), ApplicantActivity.class));
                                 finish();
                             }else{
-                                startActivity(new Intent(getApplicationContext(), RecruiterActivity.class));
+                                myUid = mFireAuth.getCurrentUser().getUid();
+                                DocumentReference documentReference = mFirestore.collection("Recruiter").document(myUid);
+                                Map<String, Object> user = new HashMap<>();
+                                user.put("email", email);
+                                user.put("password", password);
+                                documentReference.set(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        Toast.makeText(getApplicationContext(), "Data saved to database", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                startActivity(new Intent(getApplicationContext(), RecruiterProfile.class));
                                 finish();
                             }
                         }else{
