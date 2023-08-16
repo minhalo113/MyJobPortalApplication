@@ -57,7 +57,9 @@ public class JobListActivity extends AppCompatActivity {
         mainRecyclerView.setLayoutManager(layoutManager);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        UIDRAWER.myuiDrawer(this, mAuth);
+
+        int accType = getIntent().getIntExtra("accType", 2);
+        UIDRAWER.myuiDrawer(this, mAuth, accType);
     }
 
     protected void onStart(){

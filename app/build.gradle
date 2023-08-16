@@ -56,6 +56,7 @@ dependencies {
     implementation "androidx.cardview:cardview:1.0.0"
     implementation(platform("com.google.firebase:firebase-bom:32.2.0"))
     implementation("com.google.firebase:firebase-storage")
+    implementation 'com.google.firebase:firebase-storage:xx.x.x'
 }
 configurations.implementation {
     exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'

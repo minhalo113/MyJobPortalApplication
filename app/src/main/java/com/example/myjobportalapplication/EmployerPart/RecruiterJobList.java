@@ -93,7 +93,7 @@ public class RecruiterJobList extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        UIDRAWER.myuiDrawer(this, mAuth);
+        UIDRAWER.myuiDrawer(this, mAuth, 0);
         uiRecruiter();
     }
 

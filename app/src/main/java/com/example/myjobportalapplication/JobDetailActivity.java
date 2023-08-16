@@ -91,10 +91,10 @@ public class JobDetailActivity extends AppCompatActivity {
         contact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), RecruiterProfile.class);
-                intent.putExtra("able to make change?", 0);
-                startActivity(intent);
-                finish();
+//                Intent intent = new Intent(getApplicationContext(), RecruiterProfile.class);
+//                intent.putExtra("able to make change?", 0);
+//                startActivity(intent);
+//                finish();
             }
         });
     }
