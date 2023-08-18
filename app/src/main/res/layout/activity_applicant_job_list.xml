@@ -5,5 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".JobSeekerPart.ApplicantJobList">
+    <androidx.drawerlayout.widget.DrawerLayout
+        android:id="@+id/drawer_menu"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="47dp"
+        tools:layout_editor_absoluteY="-176dp">
+
+        <include layout="@layout/navigationfile" />
+    </androidx.drawerlayout.widget.DrawerLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

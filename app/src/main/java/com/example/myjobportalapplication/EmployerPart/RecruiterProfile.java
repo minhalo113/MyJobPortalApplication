@@ -71,7 +71,6 @@ public class RecruiterProfile extends AppCompatActivity {
     DocumentReference documentReference;
     private String uId;
     private int imageTap = 0;
-    private int profileChange = 1;
     ActivityResultLauncher<String> mGetAvatarImage = registerForActivityResult(new ActivityResultContracts.GetContent(),
             new ActivityResultCallback<Uri>() {
                 @Override
@@ -129,8 +128,6 @@ public class RecruiterProfile extends AppCompatActivity {
         documentReference = mFStore.collection("Recruiter").document(uId);
 
         UIDRAWER.myuiDrawer(this, mAuth, 0);
-
-        profileChange = getIntent().getIntExtra("able to make change?", 1);
 
         recruiterProfile();
     }
@@ -196,26 +193,7 @@ public class RecruiterProfile extends AppCompatActivity {
                 companyImage.setImageBitmap(scaledBitmap);
             }
         });
-        if(profileChange == 1){
-            profileChangeHandle();
-        }else{
-            nameRecruiter.setEnabled(false);
-            nameRecruiter.setTextColor(getResources().getColor(android.R.color.primary_text_light));
-            nameCompany.setEnabled(false);
-            nameCompany.setTextColor(getResources().getColor(android.R.color.primary_text_light));
-            recruiterPosition.setEnabled(false);
-            recruiterPosition.setTextColor(getResources().getColor(android.R.color.primary_text_light));
-            companyDescription.setEnabled(false);
-            companyDescription.setTextColor(getResources().getColor(android.R.color.primary_text_light));
-            emailRecruiter.setEnabled(false);
-            emailRecruiter.setTextColor(getResources().getColor(android.R.color.primary_text_light));
-            companyIndustry.setEnabled(false);
-            companyIndustry.setTextColor(getResources().getColor(android.R.color.primary_text_light));
-            phoneRecruiter.setEnabled(false);
-            phoneRecruiter.setTextColor(getResources().getColor(android.R.color.primary_text_light));
-            companyLocation.setEnabled(false);
-            companyLocation.setTextColor(getResources().getColor(android.R.color.primary_text_light));
-        }
+        profileChangeHandle();
     }
     protected void profileChangeHandle(){
         //handle when user press the avatar Image button

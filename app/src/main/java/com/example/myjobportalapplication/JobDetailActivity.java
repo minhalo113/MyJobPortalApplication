@@ -16,6 +16,9 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class JobDetailActivity extends AppCompatActivity {
     private TextView mTitle;
@@ -26,6 +29,7 @@ public class JobDetailActivity extends AppCompatActivity {
     private Button delete;
     private Button contact;
     private DatabaseReference mDatabaseReference;
+    private DocumentReference mFirebaseDatabase;
     public boolean onOptionsItemSelected(MenuItem item) {
         finish();
         return super.onOptionsItemSelected(item);
@@ -87,14 +91,12 @@ public class JobDetailActivity extends AppCompatActivity {
                 finish();
             }
         });
-
         contact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Intent intent = new Intent(getApplicationContext(), RecruiterProfile.class);
-//                intent.putExtra("able to make change?", 0);
-//                startActivity(intent);
-//                finish();
+                Intent intent = new Intent(getApplicationContext(), OtherPeopleProfile.class);
+                intent.putExtra("userID", userID);
+                startActivity(intent);
             }
         });
     }
