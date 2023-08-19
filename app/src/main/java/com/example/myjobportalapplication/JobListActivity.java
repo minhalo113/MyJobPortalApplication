@@ -99,7 +99,7 @@ public class JobListActivity extends AppCompatActivity {
                 holder.setJobDescription(model.getDescription());
                 holder.setSkills(model.getSkills());
                 holder.setSalary(model.getSalary());
-                String userID = model.getUserID();
+                String userID = model.getRecruiterID();
                 holder.myview.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -111,7 +111,7 @@ public class JobListActivity extends AppCompatActivity {
                         intent.putExtra("skills", model.getSkills());
                         intent.putExtra("salary", model.getSalary());
                         intent.putExtra("job id", model.getId());
-                        intent.putExtra("user id", model.getUserID());
+                        intent.putExtra("user id", model.getRecruiterID());
                         if(userID.equals(uId)){
                             intent.putExtra("able to delete?", 1);
                         }else{
@@ -179,7 +179,7 @@ public class JobListActivity extends AppCompatActivity {
                     holder.setJobDescription(model.getDescription());
                     holder.setSkills(model.getSkills());
                     holder.setSalary(model.getSalary());
-                    String userID = model.getUserID();
+                    String userID = model.getRecruiterID();
                     holder.myview.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -191,7 +191,7 @@ public class JobListActivity extends AppCompatActivity {
                             intent.putExtra("skills", model.getSkills());
                             intent.putExtra("salary", model.getSalary());
                             intent.putExtra("job id", model.getId());
-                            intent.putExtra("user id", model.getUserID());
+                            intent.putExtra("user id", model.getRecruiterID());
                             if (userID.equals(uId)) {
                                 intent.putExtra("able to delete?", 1);
                             } else {

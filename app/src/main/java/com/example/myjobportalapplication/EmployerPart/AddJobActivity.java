@@ -5,9 +5,7 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.text.Editable;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
@@ -54,7 +52,7 @@ public class AddJobActivity extends AppCompatActivity {
         FirebaseUser mUser = mAuth.getCurrentUser();
         uId = mUser.getUid();
 
-        mJobPost = FirebaseDatabase.getInstance().getReference().child("Job Post").child(uId);
+        mJobPost = FirebaseDatabase.getInstance().getReference().child("Job Post").child(uId).child("Recruiter Job Post");
         mPublicDatabase = FirebaseDatabase.getInstance().getReference().child("Public database");
 
         insertJob();
@@ -91,7 +89,7 @@ public class AddJobActivity extends AppCompatActivity {
                     Salary.setError("Required Field...");
                     return;
                 }
-                String id = mJobPost.push().getKey();
+                String id = mJobPost.push().getKey(); //make a unique new key (push) and then get that key (getKey)
 
                 String date = DateFormat.getDateInstance().format(new Date());
 

@@ -74,7 +74,7 @@ public class RecruiterJobList extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         uId = mAuth.getCurrentUser().getUid();
 
-        mJobPostDatabase = FirebaseDatabase.getInstance().getReference().child("Job Post").child(uId);
+        mJobPostDatabase = FirebaseDatabase.getInstance().getReference().child("Job Post").child(uId).child("Recruiter Job Post");
 
         postedJobList = findViewById(R.id.recyclerJobPost);
 
@@ -139,7 +139,7 @@ public class RecruiterJobList extends AppCompatActivity {
                         intent.putExtra("skills", model.getSkills());
                         intent.putExtra("salary", model.getSalary());
                         intent.putExtra("job id", model.getId());
-                        intent.putExtra("user id", model.getUserID());
+                        intent.putExtra("user id", model.getRecruiterID());
                         intent.putExtra("able to delete?", 1);
 
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
