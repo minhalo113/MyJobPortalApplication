@@ -4,42 +4,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".JobListActivity">
-
+    tools:context=".EmployerPart.candidateActivity">
     <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/drawer_menu"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        tools:layout_editor_absoluteX="47dp"
+        tools:layout_editor_absoluteY="-176dp">
 
-        <include layout="@layout/navigationfile" />
+    <include layout="@layout/navigationfile" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <SearchView
-                android:id = "@+id/searchView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:background="@drawable/search_view_bg"
-                android:queryHint="Search Here ..."
-                android:iconifiedByDefault = "false">
-
-            </SearchView>
-
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/mainRecyclerJobPost"
+                android:id="@+id/candidateList"
+                android:layout_gravity="center"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center" />
+                android:layout_height="match_parent" />
         </LinearLayout>
-
     </androidx.drawerlayout.widget.DrawerLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

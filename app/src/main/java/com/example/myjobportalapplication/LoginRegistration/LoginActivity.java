@@ -20,9 +20,8 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
-import com.example.myjobportalapplication.EmployerPart.RecruiterJobList;
 import com.example.myjobportalapplication.EmployerPart.RecruiterProfile;
-import com.example.myjobportalapplication.JobSeekerPart.ApplicantActivity;
+import com.example.myjobportalapplication.JobSeekerPart.ApplicantProfile;
 import com.example.myjobportalapplication.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -31,6 +30,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -109,7 +109,19 @@ public class LoginActivity extends AppCompatActivity {
                             Toast.makeText(getApplicationContext(),"Login Successful", Toast.LENGTH_SHORT).show();
                             if(accType == false){
                                 //DocumentReference documentReference = mFStore.collection()
-                                startActivity(new Intent(getApplicationContext(), ApplicantActivity.class));
+                                String userID = mAuth.getCurrentUser().getUid();
+                                DocumentReference documentReference = mFStore.collection("Job Applicant").document(userID);
+                                Map<String, Object> user = new HashMap<>();
+                                user.put("email", mEmail);
+                                user.put("password", mPassword);
+                                documentReference.set(user, SetOptions.merge()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        Log.d(TAG, "User Profile created for " + userID);
+                                    }
+                                });
+                                Intent intent = new Intent(getApplicationContext(), ApplicantProfile.class);
+                                startActivity(intent);
                                 finish();
                             }else{
                                 String userID = mAuth.getCurrentUser().getUid();
@@ -117,13 +129,12 @@ public class LoginActivity extends AppCompatActivity {
                                 Map<String, Object> user = new HashMap<>();
                                 user.put("email", mEmail);
                                 user.put("password", mPassword);
-                                documentReference.update(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                documentReference.set(user, SetOptions.merge()).addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void unused) {
                                         Log.d(TAG, "User Profile created for " + userID);
                                     }
                                 });
-
                                 startActivity(new Intent(getApplicationContext(), RecruiterProfile.class));
                                 finish();
                             }

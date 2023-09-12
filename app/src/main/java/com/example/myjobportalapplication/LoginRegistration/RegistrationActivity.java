@@ -17,9 +17,8 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
-import com.example.myjobportalapplication.EmployerPart.RecruiterJobList;
 import com.example.myjobportalapplication.EmployerPart.RecruiterProfile;
-import com.example.myjobportalapplication.JobSeekerPart.ApplicantActivity;
+import com.example.myjobportalapplication.JobSeekerPart.ApplicantProfile;
 import com.example.myjobportalapplication.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -103,7 +102,19 @@ public class RegistrationActivity extends AppCompatActivity {
                             mDialog.dismiss();
                             //startActivity(new Intent(getApplicationContext(), HomeActivity.class));
                             if(accType == false){
-                                startActivity(new Intent(getApplicationContext(), ApplicantActivity.class));
+                                myUid = mFireAuth.getCurrentUser().getUid();
+                                DocumentReference documentReference = mFirestore.collection("Job Applicant").document(myUid);
+                                Map<String, Object> user = new HashMap<>();
+                                user.put("email", email);
+                                user.put("password", password);
+                                documentReference.set(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        Toast.makeText(getApplicationContext(), "Data saved to database", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                Intent intent = new Intent(getApplicationContext(), ApplicantProfile.class);
+                                startActivity(intent);
                                 finish();
                             }else{
                                 myUid = mFireAuth.getCurrentUser().getUid();

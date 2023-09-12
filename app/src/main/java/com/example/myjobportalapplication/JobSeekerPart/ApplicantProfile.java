@@ -1,4 +1,4 @@
-package com.example.myjobportalapplication.EmployerPart;
+package com.example.myjobportalapplication.JobSeekerPart;
 
 import static android.content.ContentValues.TAG;
 
@@ -12,18 +12,23 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,8 +37,6 @@ import com.example.myjobportalapplication.uiDrawer.uiDrawer;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -48,29 +51,27 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RecruiterProfile extends AppCompatActivity {
-
+public class ApplicantProfile extends AppCompatActivity {
     private ImageButton avatarImage;
-    private ImageButton companyImage;
-    private EditText nameRecruiter;
-    private EditText nameCompany;
-
-    private EditText recruiterPosition;
-    private EditText companyDescription;
-
-    private EditText emailRecruiter;
-    private EditText companyIndustry;
-
-    private EditText phoneRecruiter;
-    private EditText companyLocation;
-    uiDrawer UIDRAWER = new uiDrawer();
+    private EditText personName;
+    private EditText Age;
+    private EditText editTextPersonSkills;
+    private EditText editTextPersonEmail;
+    private EditText editTextPersonContact;
+    private EditText editTextBriefIntro;
+    private EditText editTextEducation;
+    private EditText editTextExperience;
+    private EditText editLanguage;
+    private Button resumeUpload;
+    private TextView resumeLink;
     private FirebaseAuth mAuth;
     private FirebaseFirestore mFStore;
     private StorageReference mStorage;
-    private StorageReference compStorage;
+    private StorageReference resumeFile;
     DocumentReference documentReference;
     private String uId;
-    private int imageTap = 0;
+    uiDrawer UIDRAWER = new uiDrawer();
+    int profileChange = 1;
     ActivityResultLauncher<String> mGetAvatarImage = registerForActivityResult(new ActivityResultContracts.GetContent(),
             new ActivityResultCallback<Uri>() {
                 @Override
@@ -78,7 +79,6 @@ public class RecruiterProfile extends AppCompatActivity {
                     // Handle the returned Uri
                     if(uri != null){
                         try{
-                            if(imageTap == 1) {
                                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
 
                                 int desiredWidth = avatarImage.getWidth();
@@ -88,18 +88,6 @@ public class RecruiterProfile extends AppCompatActivity {
 
                                 avatarImage.setImageBitmap(scaledBitmap);
                                 uploadFile(bitmap, mStorage);
-                            }
-                            if(imageTap == 2){
-                                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
-
-                                int desiredWidth = companyImage.getWidth();
-                                int desiredHeight = companyImage.getHeight();
-
-                                Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, desiredWidth, desiredHeight, true);
-
-                                companyImage.setImageBitmap(scaledBitmap);
-                                uploadFile(bitmap, compStorage);
-                            }
                         }catch (IOException e){
                             e.printStackTrace();
                         }
@@ -109,7 +97,7 @@ public class RecruiterProfile extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_recruiter_profile);
+        setContentView(R.layout.activity_employer);
 
         WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
         WindowInsetsControllerCompat windowInsetsCompat = new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
@@ -122,50 +110,47 @@ public class RecruiterProfile extends AppCompatActivity {
         mFStore = FirebaseFirestore.getInstance();
         uId = mAuth.getCurrentUser().getUid();
 
-        mStorage = FirebaseStorage.getInstance().getReference().child("avatarImage/" + uId);
-        compStorage = FirebaseStorage.getInstance().getReference().child("compImage/" + uId);
+        mStorage = FirebaseStorage.getInstance().getReference().child("avatarApplicantImage/" + uId);
+        resumeFile = FirebaseStorage.getInstance().getReference().child("resumePDF/" + uId);
 
-        documentReference = mFStore.collection("Recruiter").document(uId);
+        documentReference = mFStore.collection("Job Applicant").document(uId);
 
-        UIDRAWER.myuiDrawer(this, mAuth, 0);
+        UIDRAWER.myuiDrawer(this, mAuth, 1);
 
-        recruiterProfile();
+        applicantProfile();
     }
-    private void recruiterProfile(){
+    protected void applicantProfile(){
         avatarImage = findViewById(R.id.avatarImage);
-        companyImage = findViewById(R.id.companyImage);
-
-        nameRecruiter = findViewById(R.id.editTextPersonName);
-        nameCompany = findViewById(R.id.editTextCompanyName);
-
-        recruiterPosition = findViewById(R.id.editTextPersonPosition);
-        companyDescription = findViewById(R.id.editTextCompanyDescription);
-
-        emailRecruiter = findViewById(R.id.editTextPersonEmail);
-        companyIndustry = findViewById(R.id.companyIndustryEditText);
-
-        phoneRecruiter = findViewById(R.id.editTextPersonContact);
-        companyLocation = findViewById(R.id.editTextCompanyLocation);
+        personName = findViewById(R.id.editTextPersonName);
+        Age = findViewById(R.id.editTextPersonAge);
+        editTextPersonSkills = findViewById(R.id.editTextPersonSkills);
+        editTextPersonEmail = findViewById(R.id.editTextPersonEmail);
+        editTextPersonContact = findViewById(R.id.editTextPersonContact);
+        editTextBriefIntro = findViewById(R.id.editTextBriefIntro);
+        editTextEducation = findViewById(R.id.editTextEducation);
+        editTextExperience = findViewById(R.id.editTextExperience);
+        editLanguage = findViewById(R.id.LanguageEditText);
+        resumeUpload = findViewById(R.id.resumeUpload);
+        resumeLink = findViewById(R.id.linkButton);
 
         documentReference.addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
                 if(value != null) {
-                    nameRecruiter.setText(value.getString("name"));
-                    nameCompany.setText(value.getString("Company Name"));
-                    recruiterPosition.setText(value.getString("Recruiter Position"));
-                    companyDescription.setText(value.getString("Company Description"));
-                    emailRecruiter.setText(value.getString("Recruiter's email"));
-                    companyIndustry.setText(value.getString("Company Industry"));
-                    phoneRecruiter.setText(value.getString("Phone Recruiter"));
-                    companyLocation.setText(value.getString("Company Location"));
+                    personName.setText(value.getString("name"));
+                    Age.setText(value.getString("Age"));
+                    editTextPersonSkills.setText(value.getString("PersonSkills"));
+                    editTextPersonEmail.setText(value.getString("email"));
+                    editTextPersonContact.setText(value.getString("Contact"));
+                    editTextBriefIntro.setText(value.getString("Brief Intro"));
+                    editTextEducation.setText(value.getString("Education"));
+                    editTextExperience.setText(value.getString("Experience"));
+                    editLanguage.setText(value.getString("Language"));
                 }else{
                     Log.d(TAG, "Document does not exist or user doesn't have access.");
                 }
             }
         });
-
-        //load avatar Images from database when user just log in
         final long ONE_MEGABYTE = 1024 * 1024;
         mStorage.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
             @Override
@@ -180,44 +165,73 @@ public class RecruiterProfile extends AppCompatActivity {
                 avatarImage.setImageBitmap(scaledBitmap);
             }
         });
-        compStorage.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+        resumeFile.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
-            public void onSuccess(byte[] bytes) {
-                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-
-                int desiredWidth = companyImage.getWidth();
-                int desiredHeight = companyImage.getHeight();
-
-                Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, desiredWidth, desiredHeight, true);
-
-                companyImage.setImageBitmap(scaledBitmap);
+            public void onSuccess(Uri uri) {
+                String downloadUrl = uri.toString();
+                resumeLink.setText(downloadUrl);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(getApplicationContext(), "Cannot load resume link", Toast.LENGTH_SHORT).show();
             }
         });
-        profileChangeHandle();
+        resumeLink.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                resumeLink.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        String resumeLinkText = resumeLink.getText().toString();
+                        if (Patterns.WEB_URL.matcher(resumeLinkText).matches()) {
+                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(resumeLinkText));
+                            startActivity(intent);
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Invalid URL", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+        });
+        if(profileChange == 1){
+            profileChangeHandle();
+        }else{
+            personName.setEnabled(false);
+            personName.setTextColor(getResources().getColor(android.R.color.primary_text_light));
+            Age.setEnabled(false);
+            Age.setTextColor(getResources().getColor(android.R.color.primary_text_light));
+            editTextPersonSkills.setEnabled(false);
+            editTextPersonSkills.setTextColor(getResources().getColor(android.R.color.primary_text_light));
+            editTextPersonEmail.setEnabled(false);
+            editTextPersonEmail.setTextColor(getResources().getColor(android.R.color.primary_text_light));
+            editTextPersonContact.setEnabled(false);
+            editTextPersonContact.setTextColor(getResources().getColor(android.R.color.primary_text_light));
+            editTextBriefIntro.setEnabled(false);
+            editTextBriefIntro.setTextColor(getResources().getColor(android.R.color.primary_text_light));
+            editTextEducation.setEnabled(false);
+            editTextEducation.setTextColor(getResources().getColor(android.R.color.primary_text_light));
+            editTextExperience.setEnabled(false);
+            editTextExperience.setTextColor(getResources().getColor(android.R.color.primary_text_light));
+            editLanguage.setEnabled(false);
+            editLanguage.setTextColor(getResources().getColor(android.R.color.primary_text_light));
+        }
     }
     protected void profileChangeHandle(){
-        //handle when user press the avatar Image button
         avatarImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                imageTap = 1;
                 openFileChooser();
             }
         });
-        companyImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                imageTap = 2;
-                openFileChooser();}
-        });
-        nameRecruiter.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        personName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE|| (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
                     // Retrieve the entered name
-                    String newName = nameRecruiter.getText().toString();
+                    String newName = personName.getText().toString();
                     // Set the new name as the text value of nameRecruiter
-                    nameRecruiter.setText(newName);
+                    personName.setText(newName);
                     Map<String, Object> user = new HashMap<>();
                     user.put("name", newName);
                     documentReference.update(user).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -231,20 +245,20 @@ public class RecruiterProfile extends AppCompatActivity {
                 return false;
             }
         });
-        nameCompany.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        Age.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE|| (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
                     // Retrieve the entered name
-                    String newName = nameCompany.getText().toString();
+                    String newName = Age.getText().toString();
                     // Set the new name as the text value of nameRecruiter
-                    nameCompany.setText(newName);
+                    Age.setText(newName);
                     Map<String, Object> user = new HashMap<>();
-                    user.put("Company Name", newName);
+                    user.put("Age", newName);
                     documentReference.update(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
-                            Log.d(TAG, "Company Name created for " + uId);
+                            Log.d(TAG, "Age created for " + uId);
                         }
                     });
                     return true;
@@ -252,20 +266,20 @@ public class RecruiterProfile extends AppCompatActivity {
                 return false;
             }
         });
-        recruiterPosition.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        editTextPersonSkills.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE|| (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
                     // Retrieve the entered name
-                    String newName = recruiterPosition.getText().toString();
+                    String newName = editTextPersonSkills.getText().toString();
                     // Set the new name as the text value of nameRecruiter
-                    recruiterPosition.setText(newName);
+                    editTextPersonSkills.setText(newName);
                     Map<String, Object> user = new HashMap<>();
-                    user.put("Recruiter Position", newName);
+                    user.put("PersonSkills", newName);
                     documentReference.update(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
-                            Log.d(TAG, "Recruiter Position created for " + uId);
+                            Log.d(TAG, "Skills created for " + uId);
                         }
                     });
                     return true;
@@ -273,20 +287,20 @@ public class RecruiterProfile extends AppCompatActivity {
                 return false;
             }
         });
-        companyDescription.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        editTextPersonContact.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE|| (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
                     // Retrieve the entered name
-                    String newName = companyDescription.getText().toString();
+                    String newName = editTextPersonContact.getText().toString();
                     // Set the new name as the text value of nameRecruiter
-                    companyDescription.setText(newName);
+                    editTextPersonContact.setText(newName);
                     Map<String, Object> user = new HashMap<>();
-                    user.put("Company Description", newName);
+                    user.put("Contact", newName);
                     documentReference.update(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
-                            Log.d(TAG, "Company Description created for " + uId);
+                            Log.d(TAG, "Contact created for " + uId);
                         }
                     });
                     return true;
@@ -294,20 +308,20 @@ public class RecruiterProfile extends AppCompatActivity {
                 return false;
             }
         });
-        emailRecruiter.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        editTextPersonEmail.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE|| (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
                     // Retrieve the entered name
-                    String newName = emailRecruiter.getText().toString();
+                    String newName = editTextPersonEmail.getText().toString();
                     // Set the new name as the text value of nameRecruiter
-                    emailRecruiter.setText(newName);
+                    editTextPersonEmail.setText(newName);
                     Map<String, Object> user = new HashMap<>();
-                    user.put("Recruiter's email", newName);
+                    user.put("Email", newName);
                     documentReference.update(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
-                            Log.d(TAG, "Recruiter's email created for " + uId);
+                            Log.d(TAG, "Email created for " + uId);
                         }
                     });
                     return true;
@@ -315,20 +329,21 @@ public class RecruiterProfile extends AppCompatActivity {
                 return false;
             }
         });
-        companyIndustry.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+
+        editTextBriefIntro.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE|| (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
                     // Retrieve the entered name
-                    String newName = companyIndustry.getText().toString();
+                    String newName = editTextBriefIntro.getText().toString();
                     // Set the new name as the text value of nameRecruiter
-                    companyIndustry.setText(newName);
+                    editTextBriefIntro.setText(newName);
                     Map<String, Object> user = new HashMap<>();
-                    user.put("Company Industry", newName);
+                    user.put("Brief Intro", newName);
                     documentReference.update(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
-                            Log.d(TAG, "Company Industry created for " + uId);
+                            Log.d(TAG, "Brief Intro created for " + uId);
                         }
                     });
                     return true;
@@ -336,20 +351,20 @@ public class RecruiterProfile extends AppCompatActivity {
                 return false;
             }
         });
-        phoneRecruiter.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        editTextEducation.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE|| (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
                     // Retrieve the entered name
-                    String newName = phoneRecruiter.getText().toString();
+                    String newName = editTextEducation.getText().toString();
                     // Set the new name as the text value of nameRecruiter
-                    phoneRecruiter.setText(newName);
+                    editTextEducation.setText(newName);
                     Map<String, Object> user = new HashMap<>();
-                    user.put("Phone Recruiter", newName);
+                    user.put("Education", newName);
                     documentReference.update(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
-                            Log.d(TAG, "Phone Recruiter created for " + uId);
+                            Log.d(TAG, "Education created for " + uId);
                         }
                     });
                     return true;
@@ -357,30 +372,91 @@ public class RecruiterProfile extends AppCompatActivity {
                 return false;
             }
         });
-        companyLocation.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        editTextExperience.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE|| (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
                     // Retrieve the entered name
-                    String newName = companyLocation.getText().toString();
+                    String newName = editTextExperience.getText().toString();
                     // Set the new name as the text value of nameRecruiter
-                    companyLocation.setText(newName);
+                    editTextExperience.setText(newName);
                     Map<String, Object> user = new HashMap<>();
-                    user.put("Company Location", newName);
+                    user.put("Experience", newName);
                     documentReference.update(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
-                            Log.d(TAG, "Company Location created for " + uId);
+                            Log.d(TAG, "Experience created for " + uId);
                         }
                     });
                     return true;
                 }
                 return false;
+            }
+        });
+        editLanguage.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE|| (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
+                    // Retrieve the entered name
+                    String newName = editLanguage.getText().toString();
+                    // Set the new name as the text value of nameRecruiter
+                    editLanguage.setText(newName);
+                    Map<String, Object> user = new HashMap<>();
+                    user.put("Language", newName);
+                    documentReference.update(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void unused) {
+                            Log.d(TAG, "Language created for " + uId);
+                        }
+                    });
+                    return true;
+                }
+                return false;
+            }
+        });
+        resumeUpload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selectFiles();
             }
         });
     }
+
     private void openFileChooser(){
         mGetAvatarImage.launch("image/*");
+    }
+    private void uploadResume(Uri pdf){
+        resumeFile.putFile(pdf).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Toast.makeText(getApplicationContext(), "Upload Completed. Please wait 2 seconds to refresh.", Toast.LENGTH_SHORT).show();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        startActivity(new Intent(getApplicationContext(), ApplicantProfile.class));
+                        finish();
+                    }
+                }, 2000);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(getApplicationContext(), "Upload Failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    private void selectFiles(){
+        Intent intent = new Intent();
+        intent.setType("application/pdf");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select PDF Files..."), 1);
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == 1 && resultCode == RESULT_OK && data!= null && data.getData()!= null){
+            uploadResume(data.getData());
+        }
     }
     private void uploadFile(Bitmap mImage, StorageReference choosenStorage){
         if(mImage != null){
