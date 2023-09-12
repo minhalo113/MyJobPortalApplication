@@ -5,6 +5,7 @@
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
+        android:enableOnBackInvokedCallback="true"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -12,10 +13,13 @@
         android:theme="@style/Theme.MyJobPortalApplication"
         tools:targetApi="31">
         <activity
-            android:name=".CandidatesActivity"
+            android:name=".EmployerPart.CandidateDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".OtherPeopleProfile"
+            android:name=".EmployerPart.candidateActivity"
+            android:exported="false" />
+        <activity
+            android:name=".EmployerPart.OtherRecruiterProfile"
             android:exported="false" />
         <activity
             android:name=".JobSeekerPart.ApplicantJobList"

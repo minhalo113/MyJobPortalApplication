@@ -1,5 +1,8 @@
 package com.example.myjobportalapplication.data_Model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Data {
     String title;
     String skills;
@@ -74,5 +77,18 @@ public class Data {
     }
     public void setRecruiterID(String recruiterID) {
         this.recruiterID = recruiterID;
+    }
+
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("date", this.date);
+        result.put("description", this.description);
+        result.put("id", this.id);
+        result.put("recruiterID", this.recruiterID);
+        result.put("salary", this.salary);
+        result.put("skills", this.skills);
+        result.put("title", this.title);
+
+        return result;
     }
 }

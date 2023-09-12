@@ -1,4 +1,4 @@
-package com.example.myjobportalapplication;
+package com.example.myjobportalapplication.EmployerPart;
 
 import static android.content.ContentValues.TAG;
 
@@ -16,8 +16,8 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import com.example.myjobportalapplication.R;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -26,7 +26,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-public class OtherPeopleProfile extends AppCompatActivity {
+public class OtherRecruiterProfile extends AppCompatActivity {
     private ImageButton avatarImage;
     private ImageButton companyImage;
     private EditText nameRecruiter;

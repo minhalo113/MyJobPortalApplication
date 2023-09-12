@@ -9,6 +9,9 @@
     <item android:title="Profile"
         android:icon="@drawable/baseline_person_24"
         android:id ="@+id/profileNavigateBar"/>
+    <item android:title = "Candidates"
+        android:icon="@drawable/baseline_groups_24"
+        android:id="@+id/candidatesNavigateBar"/>
     <item android:title="Chat"
         android:icon="@drawable/baseline_chat_24"
         android:id = "@+id/chatNavigateBar"/>

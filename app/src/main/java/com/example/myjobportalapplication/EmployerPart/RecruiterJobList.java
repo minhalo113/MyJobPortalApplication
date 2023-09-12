@@ -127,7 +127,6 @@ public class RecruiterJobList extends AppCompatActivity {
                 holder.setJobDescription(model.getDescription());
                 holder.setJobSkills(model.getSkills());
                 holder.setSalary(model.getSalary());
-
                 holder.myView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {

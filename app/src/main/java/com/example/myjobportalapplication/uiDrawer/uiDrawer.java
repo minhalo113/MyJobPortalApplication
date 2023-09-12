@@ -2,6 +2,7 @@ package com.example.myjobportalapplication.uiDrawer;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -13,6 +14,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.myjobportalapplication.ChatActivity;
 import com.example.myjobportalapplication.EmployerPart.RecruiterProfile;
+import com.example.myjobportalapplication.EmployerPart.candidateActivity;
 import com.example.myjobportalapplication.JobListActivity;
 import com.example.myjobportalapplication.JobSeekerPart.ApplicantJobList;
 import com.example.myjobportalapplication.JobSeekerPart.ApplicantProfile;
@@ -36,6 +38,10 @@ public class uiDrawer extends AppCompatActivity {
         drawerLayout.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
         mAccType = accType;
+        if(mAccType == 1){
+            MenuItem item = navigationView.getMenu().findItem(R.id.candidatesNavigateBar);
+            item.setVisible(false);
+        }
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -88,6 +94,13 @@ public class uiDrawer extends AppCompatActivity {
                             mAccType = 1;
                             Intent intent = new Intent(activity.getApplicationContext(), ApplicantProfile.class);
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            activity.startActivity(intent);
+                            break;
+                        }
+                        case R.id.candidatesNavigateBar:{
+                            Toast.makeText(activity, "Candidates Management", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(activity.getApplicationContext(), candidateActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             activity.startActivity(intent);
                             break;
                         }

@@ -1,6 +1,7 @@
 package com.example.myjobportalapplication;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -11,22 +12,26 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.myjobportalapplication.EmployerPart.RecruiterProfile;
+import com.example.myjobportalapplication.EmployerPart.OtherRecruiterProfile;
 import com.example.myjobportalapplication.data_Model.Data;
+import com.example.myjobportalapplication.data_Model.applicantData;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 
-import java.text.DateFormat;
-import java.util.Date;
+import java.util.Map;
 
 public class JobDetailActivity extends AppCompatActivity {
     private EditText mTitle;
@@ -39,7 +44,9 @@ public class JobDetailActivity extends AppCompatActivity {
     private Button apply;
     private Button cancel;
     private Button edit;
+    private DocumentReference mdocumentReference;
     private DatabaseReference mDatabaseReference;
+
     public boolean onOptionsItemSelected(MenuItem item) {
         finish();
         return super.onOptionsItemSelected(item);
@@ -79,9 +86,9 @@ public class JobDetailActivity extends AppCompatActivity {
 
         mTitle.setText(title);
         mDate.setText("Date: " + date);
-        mDescription.setText("Description: " +description);
-        mSalary.setText("Salary: " + salary);
-        mSkills.setText("Skills: " + skills);
+        mDescription.setText(description);
+        mSalary.setText(salary);
+        mSkills.setText( skills);
 
         mTitle.setEnabled(false);
         mTitle.setTextColor(Color.BLACK);
@@ -129,13 +136,45 @@ public class JobDetailActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), "Cannot delete in public database", Toast.LENGTH_SHORT).show();
                     }
                 });
+
+                mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Job Post");
+                mDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for(DataSnapshot accountSnapshot : snapshot.getChildren()){
+                            DataSnapshot CandidateSnapshot = accountSnapshot.child("Candidates List");
+                            if(CandidateSnapshot.hasChild(jobId)){
+                                CandidateSnapshot.child(jobId).getRef().removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+
+                                    }
+                                });
+                            }
+                            DataSnapshot JobApplicantSnapshot = accountSnapshot.child("Applicant Job Post");
+                            if(JobApplicantSnapshot.hasChild(jobId)){
+                                JobApplicantSnapshot.child(jobId).getRef().removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+
+                                    }
+                                });
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
                 finish();
             }
         });
         contact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), OtherPeopleProfile.class);
+                Intent intent = new Intent(getApplicationContext(), OtherRecruiterProfile.class);
                 intent.putExtra("userID", recruiterID);
                 startActivity(intent);
             }
@@ -148,8 +187,21 @@ public class JobDetailActivity extends AppCompatActivity {
                 mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Job Post").child(userID).child("Applicant Job Post").child(jobId);
                 mDatabaseReference.setValue(data);
 
-                mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Job Post").child(recruiterID).child("Candidates List").child(jobId);
-                mDatabaseReference.setValue(data);
+                mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Job Post").child(recruiterID).child("Candidates List").child(jobId).child(userID);
+
+                mdocumentReference = FirebaseFirestore.getInstance().collection("Job Applicant").document(userID);
+                mdocumentReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                        @Override
+                        public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                            if (value != null) {
+                                String appName = value.getString("name");
+                                String appAge = value.getString("Age");
+                                applicantData mData = new applicantData(appName, appAge);
+                                mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Job Post").child(recruiterID).child("Candidates List").child(jobId).child(userID);
+                                mDatabaseReference.setValue(mData);
+                            }
+                        }
+                });
 
                 Toast.makeText(getApplicationContext(), "Successful! You can check for more detail at My Job Management.", Toast.LENGTH_SHORT).show();
                 finish();
@@ -178,7 +230,61 @@ public class JobDetailActivity extends AppCompatActivity {
         edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //mDatabaseReference = FirebaseDatabase.getInstance().getReference().child;
+                if(TextUtils.isEmpty(title)){
+                    mTitle.setError("Required Field...");
+                    return;
+                }
+                if(TextUtils.isEmpty(skills)){
+                    mSkills.setError("Required Field...");
+                    return;
+                }
+                if(TextUtils.isEmpty(description)){
+                    mDescription.setError("Required Field...");
+                    return;
+                }
+                if(TextUtils.isEmpty(salary)){
+                    mSalary.setError("Required Field...");
+                    return;
+                }
+
+                String title = mTitle.getText().toString().trim();
+                String skills = mSkills.getText().toString().trim();
+                String description = mDescription.getText().toString().trim();
+                String salary = mSalary.getText().toString().trim();
+
+                Data data = new Data(title, skills, description, salary, jobId, date, userID);
+                Map<String, Object> newValue = data.toMap();
+
+                mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Job Post").child(recruiterID).child("Recruiter Job Post").child(jobId);
+                mDatabaseReference.setValue(data);
+
+                mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Public database").child(jobId);
+                mDatabaseReference.setValue(data);
+
+                mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Job Post");
+                mDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for(DataSnapshot accountSnapshot : snapshot.getChildren()){
+                            DataSnapshot JobApplicantSnapshot = accountSnapshot.child("Applicant Job Post");
+                            if(JobApplicantSnapshot.hasChild(jobId)){
+                                JobApplicantSnapshot.child(jobId).getRef().setValue(data).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(getApplicationContext(), "Change Unuccessful", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
+                Toast.makeText(getApplicationContext(), "Successful", Toast.LENGTH_SHORT).show();
+                finish();
             }
         });
     }
