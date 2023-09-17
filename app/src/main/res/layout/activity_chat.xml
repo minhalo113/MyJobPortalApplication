@@ -4,6 +4,36 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ChatActivity">
+    android:animateLayoutChanges="true"
+    tools:context=".commonActivities.ChatActivity">
+
+    <ImageView
+        android:id="@+id/imageProfile"
+        android:layout_width="62dp"
+        android:layout_height="62dp"
+        android:background="@drawable/avatar_chat_image"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.062"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.034"></ImageView>
+
+    <TextView
+        android:id="@+id/textName"
+        android:layout_width="302dp"
+        android:layout_height="31dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:ellipsize="end"
+        android:textColor="?attr/colorPrimary"
+        android:textSize="14sp"
+        android:maxLines="1"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/imageProfile"
+        app:layout_constraintStart_toEndOf="@+id/imageProfile"
+        app:layout_constraintTop_toTopOf="@+id/imageProfile"
+        app:layout_constraintVertical_bias="0.5"></TextView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

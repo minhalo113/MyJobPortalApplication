@@ -1,5 +1,7 @@
 package com.example.myjobportalapplication.LoginRegistration;
 
+import static android.content.ContentValues.TAG;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowCompat;
@@ -10,6 +12,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -21,11 +24,14 @@ import com.example.myjobportalapplication.EmployerPart.RecruiterProfile;
 import com.example.myjobportalapplication.JobSeekerPart.ApplicantProfile;
 import com.example.myjobportalapplication.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -113,6 +119,7 @@ public class RegistrationActivity extends AppCompatActivity {
                                         Toast.makeText(getApplicationContext(), "Data saved to database", Toast.LENGTH_SHORT).show();
                                     }
                                 });
+                                getToken();
                                 Intent intent = new Intent(getApplicationContext(), ApplicantProfile.class);
                                 startActivity(intent);
                                 finish();
@@ -128,6 +135,7 @@ public class RegistrationActivity extends AppCompatActivity {
                                         Toast.makeText(getApplicationContext(), "Data saved to database", Toast.LENGTH_SHORT).show();
                                     }
                                 });
+                                getToken();
                                 startActivity(new Intent(getApplicationContext(), RecruiterProfile.class));
                                 finish();
                             }
@@ -158,6 +166,42 @@ public class RegistrationActivity extends AppCompatActivity {
                 }
                 System.out.println(accType);
                 colorChange();
+            }
+        });
+    }
+
+    private void getToken(){
+        FirebaseMessaging.getInstance().getToken().addOnSuccessListener(new OnSuccessListener<String>() {
+            @Override
+            public void onSuccess(String s) {
+                updateToken(s, mFireAuth.getCurrentUser().getUid());
+            }
+        });
+    }
+    private void updateToken(String token, String uId){
+        FirebaseFirestore database = FirebaseFirestore.getInstance();
+        DocumentReference documentReference = database.collection("Job Applicant").document(uId);
+        documentReference.update("FCM TOKEN", token).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Log.d(TAG, "Token Updated");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, "Token Failed");
+            }
+        });
+        documentReference = database.collection("Recruiter").document(uId);
+        documentReference.update("FCM TOKEN", token).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Log.d(TAG, "Token Updated");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, "Token Failed");
             }
         });
     }

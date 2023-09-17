@@ -1,8 +1,10 @@
 package com.example.myjobportalapplication.uiDrawer;
 
+import static android.content.ContentValues.TAG;
+
 import android.app.Activity;
 import android.content.Intent;
-import android.view.Menu;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -12,18 +14,25 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import com.example.myjobportalapplication.ChatActivity;
 import com.example.myjobportalapplication.EmployerPart.RecruiterProfile;
 import com.example.myjobportalapplication.EmployerPart.candidateActivity;
-import com.example.myjobportalapplication.JobListActivity;
+import com.example.myjobportalapplication.commonActivities.ChatList;
+import com.example.myjobportalapplication.commonActivities.JobListActivity;
 import com.example.myjobportalapplication.JobSeekerPart.ApplicantJobList;
 import com.example.myjobportalapplication.JobSeekerPart.ApplicantProfile;
 import com.example.myjobportalapplication.LoginRegistration.LoginActivity;
 import com.example.myjobportalapplication.R;
 import com.example.myjobportalapplication.EmployerPart.RecruiterJobList;
 import com.example.myjobportalapplication.Settings.Settings;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.lang.reflect.Field;
 
 public class uiDrawer extends AppCompatActivity {
 
@@ -64,7 +73,11 @@ public class uiDrawer extends AppCompatActivity {
                             break;
                         }
                         case R.id.chatNavigateBar: {
-                            Toast.makeText(activity, "Chat Selected", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(activity, "Chat List Selected", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(activity.getApplicationContext(), ChatList.class);
+                            intent.putExtra("accType", 0);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            activity.startActivity(intent);
                             break;
                         }
                         case R.id.settingsNavigateBar: {
@@ -86,6 +99,11 @@ public class uiDrawer extends AppCompatActivity {
                             Intent intent = new Intent(activity.getApplicationContext(), LoginActivity.class);
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                             activity.startActivity(intent);
+                            FirebaseFirestore database = FirebaseFirestore.getInstance();
+                            DocumentReference documentReference = database.collection("Job Applicant").document(mAuth.getCurrentUser().getUid());
+                            documentReference.update("FCM TOKEN", FieldValue.delete());
+                            documentReference = database.collection("Recruiter").document(mAuth.getCurrentUser().getUid());
+                            documentReference.update("FCM TOKEN", FieldValue.delete());
                             mAuth.signOut();
                             break;
                         }
@@ -123,7 +141,11 @@ public class uiDrawer extends AppCompatActivity {
                             break;
                         }
                         case R.id.chatNavigateBar: {
-                            Toast.makeText(activity, "Chat Selected", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(activity, "Chat List Selected", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(activity.getApplicationContext(), ChatList.class);
+                            intent.putExtra("accType", 1);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            activity.startActivity(intent);
                             break;
                         }
                         case R.id.settingsNavigateBar: {
@@ -145,6 +167,11 @@ public class uiDrawer extends AppCompatActivity {
                             Intent intent = new Intent(activity.getApplicationContext(), LoginActivity.class);
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                             activity.startActivity(intent);
+                            FirebaseFirestore database = FirebaseFirestore.getInstance();
+                            DocumentReference documentReference = database.collection("Job Applicant").document(mAuth.getCurrentUser().getUid());
+                            documentReference.update("FCM TOKEN", FieldValue.delete());
+                            documentReference = database.collection("Recruiter").document(mAuth.getCurrentUser().getUid());
+                            documentReference.update("FCM TOKEN", FieldValue.delete());
                             mAuth.signOut();
                             break;
                         }

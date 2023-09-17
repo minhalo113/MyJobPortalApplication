@@ -9,14 +9,23 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.myjobportalapplication.JobSeekerPart.OtherApplicantProfile;
 import com.example.myjobportalapplication.R;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import org.w3c.dom.Document;
 
 import java.util.ArrayList;
 
@@ -26,6 +35,7 @@ public class CandidateDetailActivity extends AppCompatActivity {
     ArrayList<String> applicantNamesList;
     ArrayList<String> applicantAgeList;
     ArrayList<String> applicantIdList;
+    CollectionReference applicantRef;
     //private FirebaseAuth mAuth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +54,8 @@ public class CandidateDetailActivity extends AppCompatActivity {
         layoutManager.setReverseLayout(true);
         layoutManager.setStackFromEnd(true);
 
+        applicantRef = FirebaseFirestore.getInstance().collection("Job Applicant");
+
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(layoutManager);
 
@@ -51,23 +63,21 @@ public class CandidateDetailActivity extends AppCompatActivity {
     protected void onStart(){
         super.onStart();
 
-        Bundle bundleName = getIntent().getExtras();
-        Bundle bundleAge = getIntent().getExtras();
-        Bundle bundleId = getIntent().getExtras();
+        applicantNamesList = getIntent().getStringArrayListExtra("candidateName");
+        applicantAgeList = getIntent().getStringArrayListExtra("candidateAge");
+        applicantIdList = getIntent().getStringArrayListExtra("candidateKey");
 
-        applicantNamesList = bundleName.getStringArrayList("applicantNamesList");
-        applicantAgeList = bundleName.getStringArrayList("applicantAgeList");
-        applicantIdList = bundleName.getStringArrayList("applicantIdList");
-
-        MyAdapter madapter = new MyAdapter(applicantNamesList, applicantAgeList);
+        MyAdapter madapter = new MyAdapter(applicantNamesList, applicantAgeList, applicantIdList);
         mRecyclerView.setAdapter(madapter);
     }
     public class MyAdapter extends RecyclerView.Adapter<MyViewholder>{
-        private ArrayList<String> itemList1;
-        private ArrayList<String> itemList2;
-        public MyAdapter(ArrayList<String> itemList1, ArrayList<String> itemList2) {
+        private ArrayList<String> itemList1 = new ArrayList<>();
+        private ArrayList<String> itemList2 = new ArrayList<>();
+        private ArrayList<String> itemList3 = new ArrayList<>();
+        public MyAdapter(ArrayList<String> itemList1, ArrayList<String> itemList2, ArrayList<String> itemList3) {
             this.itemList1 = itemList1;
             this.itemList2 = itemList2;
+            this.itemList3 = itemList3;
         }
 
         @NonNull
@@ -85,7 +95,10 @@ public class CandidateDetailActivity extends AppCompatActivity {
             holder.textview.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
+                    Intent intent = new Intent(getApplicationContext(), OtherApplicantProfile.class);
+                    intent.putExtra("userId", itemList3.get(holder.getAbsoluteAdapterPosition()));
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
                 }
             });
         }
@@ -96,14 +109,20 @@ public class CandidateDetailActivity extends AppCompatActivity {
         }
     }
     public class MyViewholder extends RecyclerView.ViewHolder{
-        TextView textview;
+        View textview;
         public MyViewholder(@NonNull View itemView) {
             super(itemView);
+            textview = itemView;
         }
         public void setString(String s, String x){
-            TextView mString = textview.findViewById(R.id.nameAge);
-            mString.setText(s + ", " + x + " years old.");
+            TextView mString = textview.findViewById(R.id.name);
+            TextView mStringAge = textview.findViewById(R.id.Age);
+            mString.setText("Name: " + s);
+            mStringAge.setText("Age: " + x);
         }
     }
-
+    public boolean onOptionsItemSelected(MenuItem item) {
+        finish();
+        return super.onOptionsItemSelected(item);
+    }
 }

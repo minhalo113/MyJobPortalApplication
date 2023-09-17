@@ -23,7 +23,9 @@ import android.widget.Toast;
 import com.example.myjobportalapplication.EmployerPart.RecruiterProfile;
 import com.example.myjobportalapplication.JobSeekerPart.ApplicantProfile;
 import com.example.myjobportalapplication.R;
+import com.google.android.gms.common.internal.Constants;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -31,6 +33,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -106,7 +109,7 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
-                            Toast.makeText(getApplicationContext(),"Login Successful", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(),"Login Successful !", Toast.LENGTH_SHORT).show();
                             if(accType == false){
                                 //DocumentReference documentReference = mFStore.collection()
                                 String userID = mAuth.getCurrentUser().getUid();
@@ -114,12 +117,8 @@ public class LoginActivity extends AppCompatActivity {
                                 Map<String, Object> user = new HashMap<>();
                                 user.put("email", mEmail);
                                 user.put("password", mPassword);
-                                documentReference.set(user, SetOptions.merge()).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void unused) {
-                                        Log.d(TAG, "User Profile created for " + userID);
-                                    }
-                                });
+                                documentReference.set(user, SetOptions.merge());
+                                getToken();
                                 Intent intent = new Intent(getApplicationContext(), ApplicantProfile.class);
                                 startActivity(intent);
                                 finish();
@@ -129,12 +128,8 @@ public class LoginActivity extends AppCompatActivity {
                                 Map<String, Object> user = new HashMap<>();
                                 user.put("email", mEmail);
                                 user.put("password", mPassword);
-                                documentReference.set(user, SetOptions.merge()).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void unused) {
-                                        Log.d(TAG, "User Profile created for " + userID);
-                                    }
-                                });
+                                documentReference.set(user, SetOptions.merge());
+                                getToken();
                                 startActivity(new Intent(getApplicationContext(), RecruiterProfile.class));
                                 finish();
                             }
@@ -168,6 +163,41 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+    }
+    private void getToken(){
+        FirebaseMessaging.getInstance().getToken().addOnSuccessListener(new OnSuccessListener<String>() {
+            @Override
+            public void onSuccess(String s) {
+                updateToken(s, mAuth.getCurrentUser().getUid());
+            }
+        });
+    }
+    private void updateToken(String token, String uId){
+        FirebaseFirestore database = FirebaseFirestore.getInstance();
+        DocumentReference documentReference = database.collection("Job Applicant").document(uId);
+        documentReference.update("FCM TOKEN", token).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Log.d(TAG, "Token Updated");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, "Token Failed");
+            }
+        });
+        documentReference = database.collection("Recruiter").document(uId);
+        documentReference.update("FCM TOKEN", token).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Log.d(TAG, "Token Updated");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, "Token Failed");
+            }
+        });
     }
     protected void colorChange(){
         applicant = findViewById(R.id.applicantButtonLogin);

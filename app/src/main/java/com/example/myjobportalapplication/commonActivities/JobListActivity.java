@@ -1,4 +1,4 @@
-package com.example.myjobportalapplication;
+package com.example.myjobportalapplication.commonActivities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.SearchView;
 import android.widget.TextView;
 
+import com.example.myjobportalapplication.R;
 import com.example.myjobportalapplication.data_Model.Data;
 import com.example.myjobportalapplication.uiDrawer.uiDrawer;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -25,8 +26,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-
-import java.util.Locale;
 
 public class JobListActivity extends AppCompatActivity {
     private RecyclerView mainRecyclerView;

@@ -1,4 +1,4 @@
-package com.example.myjobportalapplication;
+package com.example.myjobportalapplication.commonActivities;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.myjobportalapplication.EmployerPart.OtherRecruiterProfile;
+import com.example.myjobportalapplication.R;
 import com.example.myjobportalapplication.data_Model.Data;
 import com.example.myjobportalapplication.data_Model.applicantData;
 import com.google.android.gms.tasks.OnFailureListener;

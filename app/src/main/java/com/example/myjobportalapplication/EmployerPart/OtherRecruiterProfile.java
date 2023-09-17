@@ -46,7 +46,6 @@ public class OtherRecruiterProfile extends AppCompatActivity {
     private StorageReference mStorage;
     private StorageReference compStorage;
     DocumentReference documentReference;
-    private int imageTap = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

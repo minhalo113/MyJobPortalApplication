@@ -180,18 +180,13 @@ public class ApplicantProfile extends AppCompatActivity {
         resumeLink.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                resumeLink.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
                         String resumeLinkText = resumeLink.getText().toString();
                         if (Patterns.WEB_URL.matcher(resumeLinkText).matches()) {
                             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(resumeLinkText));
                             startActivity(intent);
                         } else {
                             Toast.makeText(getApplicationContext(), "Invalid URL", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+                };
             }
         });
         if(profileChange == 1){
