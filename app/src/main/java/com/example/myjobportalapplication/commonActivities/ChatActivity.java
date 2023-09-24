@@ -1,38 +1,38 @@
 package com.example.myjobportalapplication.commonActivities;
 
-import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.example.myjobportalapplication.R;
+import com.example.myjobportalapplication.Adapter.chatAdapter;
 import com.example.myjobportalapplication.data_Model.chatMessage;
 import com.example.myjobportalapplication.databinding.ActivityChatBinding;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -41,12 +41,15 @@ import java.util.Locale;
 public class ChatActivity extends AppCompatActivity {
     private ActivityChatBinding binding;
     private String userID;
+    private String receiverName;
     private DocumentReference documentReference;
+    private DocumentReference recruiterInfo;
     private FirebaseFirestore databaseChat;
     private FirebaseAuth mAuth;
     private StorageReference mStorage;
     private ArrayList<chatMessage> chatMessages;
-    private chatAdapter chatAdapter;
+    private String conversionId = null;
+    private com.example.myjobportalapplication.Adapter.chatAdapter chatAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,8 +65,8 @@ public class ChatActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         userID = getIntent().getStringExtra("userId");
-        System.out.println(userID);
         documentReference = FirebaseFirestore.getInstance().collection("Job Applicant").document(userID);
+        recruiterInfo = FirebaseFirestore.getInstance().collection("Recruiter").document(mAuth.getCurrentUser().getUid());
         mStorage = FirebaseStorage.getInstance().getReference().child("avatarImage/" + userID);
 
         setListeners();
@@ -94,7 +97,32 @@ public class ChatActivity extends AppCompatActivity {
         message.put("message", binding.inputMessage.getText().toString());
         message.put("time", new Date());
         databaseChat.collection("Recruiter -> Applicant (Chat)").add(message);
-        binding.inputMessage.setText(null);
+
+        final String[] name = {null};
+        recruiterInfo.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()){
+                    DocumentSnapshot document = task.getResult();
+                    if(document.exists()){
+                        name[0] = document.getString("name");
+                        if(conversionId != null){
+                            updateConversion(binding.inputMessage.getText().toString());
+                        }else{
+                            HashMap<String, Object> conversion = new HashMap<>();
+                            conversion.put("senderID", mAuth.getCurrentUser().getUid());
+                            conversion.put("senderName", name[0]);
+                            conversion.put("receiverName", receiverName);
+                            conversion.put("receiverID", userID);
+                            conversion.put("lastMessage", binding.inputMessage.getText().toString());
+                            conversion.put("time", new Date());
+                            addConversion(conversion);
+                        }
+                        binding.inputMessage.setText(null);
+                    }
+                }
+            }
+        });
     }
 
     private void listenMessages(){
@@ -134,6 +162,9 @@ public class ChatActivity extends AppCompatActivity {
             }
             binding.chatRecyclerView.setVisibility(View.VISIBLE);
         }
+        if(conversionId == null){
+            checkForConversion();
+        }
     });
     private void loadUserDetails(){
         documentReference.get()
@@ -141,8 +172,8 @@ public class ChatActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         if (documentSnapshot.exists()) {
-                            String name = documentSnapshot.getString("name");
-                            binding.textName.setText(name);
+                            receiverName = documentSnapshot.getString("name");
+                            binding.textName.setText(receiverName);
                         }
                     }
                 });
@@ -169,10 +200,46 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void checkForConversion(){
+        if(chatMessages.size() != 0){
+            checkForConversionRemotely(mAuth.getCurrentUser().getUid(), userID);
+            checkForConversionRemotely(userID, mAuth.getCurrentUser().getUid());
+        }
+    }
+    private void checkForConversionRemotely(String senderId, String receiverId){
+        databaseChat.collection("conversations")
+                .whereEqualTo("senderID", senderId)
+                .whereEqualTo("receiverID", receiverId)
+                .get()
+                .addOnCompleteListener(conversionOnCompleteListener);
+    }
+
+    private final OnCompleteListener<QuerySnapshot> conversionOnCompleteListener = task -> {
+        if(task.isSuccessful() && task.getResult() != null && task.getResult().getDocuments().size() > 0){
+            DocumentSnapshot documentSnapshot = task.getResult().getDocuments().get(0);
+            conversionId = documentSnapshot.getId();
+        }
+    };
     private String getReadableDateTime(Date date){
         return new SimpleDateFormat("MMMM dd, yyyy - hh:mm a", Locale.getDefault()).format(date);
     }
+    private void addConversion(HashMap<String, Object> conversion){
+        databaseChat.collection("conversations").add(conversion).addOnSuccessListener(documentReference1 -> conversionId = documentReference1.getId());
+    }
+
+    private void updateConversion(String message){
+        DocumentReference documentReference1 = databaseChat.collection("conversations").document(conversionId);
+        documentReference1.update(
+                "lastMessage", message,
+                "time", new Date()
+        );
+    }
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent = new Intent(getApplicationContext(), ChatList.class);
+        intent.putExtra("accType", 0);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
         finish();
         return super.onOptionsItemSelected(item);
     }

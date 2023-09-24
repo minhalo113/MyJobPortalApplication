@@ -1,4 +1,4 @@
-package com.example.myjobportalapplication.commonActivities;
+package com.example.myjobportalapplication.Adapter;
 
 import android.graphics.Bitmap;
 import android.view.LayoutInflater;

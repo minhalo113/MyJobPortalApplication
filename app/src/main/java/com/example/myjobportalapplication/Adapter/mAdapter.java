@@ -1,4 +1,4 @@
-package com.example.myjobportalapplication.commonActivities;
+package com.example.myjobportalapplication.Adapter;
 
 import static com.google.common.primitives.UnsignedInts.max;
 
