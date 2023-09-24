@@ -10,11 +10,13 @@ import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.SyncStateContract;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -71,65 +73,32 @@ public class ChatList extends AppCompatActivity {
         int accType = getIntent().getIntExtra("accType", 2);
         UIDRAWER.myuiDrawer(this, mAuth, accType);
 
+        addChat = findViewById(R.id.fabNewChat);
         loadUserDetail();
     }
 
     private void loadUserDetail(){
         FirebaseFirestore database = FirebaseFirestore.getInstance();
-
+        addChat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), chatAddList.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+            }
+        });
 
 //        mAdapter myAdapter = new mAdapter();
 //        mRecyclerView.setAdapter(myAdapter);
     }
-    public class mAdapter extends RecyclerView.Adapter<chatViewHolder>{
-        private ArrayList<String> chatName;
-        private ArrayList<String> chatPhone;
-        private ArrayList<String> chatEmail;
-        private ArrayList<Bitmap> chatImage;
 
-        public mAdapter(ArrayList<String> chatName, ArrayList<String> chatPhone, ArrayList<Bitmap> chatImage, ArrayList<String> chatEmail) {
-            this.chatName = chatName;
-            this.chatPhone = chatPhone;
-            this.chatImage = chatImage;
-            this.chatEmail = chatEmail;
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(UIDRAWER != null && UIDRAWER.onOptionsItemSelected(item)){
+            return true;
         }
-
-        @NonNull
-        @Override
-        public chatViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_container_user_chat, parent, false);
-            return new ChatList.chatViewHolder(itemView);
-        }
-        @Override
-        public void onBindViewHolder(@NonNull chatViewHolder holder, int position) {
-            String item1 = chatName.get(position);
-            String item2 = chatPhone.get(position);
-            String item3 = chatEmail.get(position);
-            Bitmap bitmap = chatImage.get(position);
-
-            holder.setInfo(bitmap, item2, item1, item3);
-        }
-        @Override
-        public int getItemCount() {
-            return max(chatName.size(), chatPhone.size(), chatImage.size(), chatEmail.size());
-        }
+        return super.onOptionsItemSelected(item);
     }
-    public static class chatViewHolder extends RecyclerView.ViewHolder{
-        View myTextView;
-
-        public chatViewHolder(@NonNull View itemView) {
-            super(itemView);
-            this.myTextView = itemView;
-        }
-
-        public void setInfo(Bitmap bitmap, String phone, String name, String email){
-            TextView mName = myTextView.findViewById(R.id.TextName);
-            TextView mPhoneEmail = myTextView.findViewById(R.id.textEmailTele);
-            ImageView mImage = myTextView.findViewById(R.id.imageProfile);
-
-            mName.setText(name);
-            mPhoneEmail.setText(phone + "\n" + email);
-            mImage.setImageBitmap(bitmap);
-        }
+    public void onBackPressed(){
+        UIDRAWER.onBackPressed();
     }
 }

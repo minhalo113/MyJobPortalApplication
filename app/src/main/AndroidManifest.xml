@@ -15,6 +15,9 @@
         android:theme="@style/Theme.MyJobPortalApplication"
         tools:targetApi="31">
         <activity
+            android:name=".commonActivities.chatAddList"
+            android:exported="false" />
+        <activity
             android:name=".commonActivities.ChatList"
             android:exported="false" />
         <activity
@@ -43,6 +46,7 @@
             android:exported="false" />
         <activity
             android:name=".commonActivities.ChatActivity"
+            android:windowSoftInputMode="adjustResize"
             android:exported="false" />
         <activity
             android:name=".commonActivities.JobDetailActivity"
@@ -58,9 +62,6 @@
             android:exported="false" />
         <activity
             android:name=".EmployerPart.RecruiterJobList"
-            android:exported="false" />
-        <activity
-            android:name=".commonActivities.HomeActivity"
             android:exported="false" />
         <activity
             android:name=".LoginRegistration.RegistrationActivity"

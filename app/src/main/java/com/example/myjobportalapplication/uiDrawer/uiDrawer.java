@@ -141,11 +141,11 @@ public class uiDrawer extends AppCompatActivity {
                             break;
                         }
                         case R.id.chatNavigateBar: {
-                            Toast.makeText(activity, "Chat List Selected", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(activity.getApplicationContext(), ChatList.class);
-                            intent.putExtra("accType", 1);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            activity.startActivity(intent);
+//                            Toast.makeText(activity, "Chat List Selected", Toast.LENGTH_SHORT).show();
+//                            Intent intent = new Intent(activity.getApplicationContext(), ChatList.class);
+//                            intent.putExtra("accType", 1);
+//                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                            activity.startActivity(intent);
                             break;
                         }
                         case R.id.settingsNavigateBar: {
