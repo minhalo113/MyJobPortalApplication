@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -12,6 +14,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyJobPortalApplication"
         tools:targetApi="31">
+        <activity
+            android:name=".commonActivities.chatAddList"
+            android:exported="false" />
+        <activity
+            android:name=".commonActivities.ChatList"
+            android:exported="false" />
+        <activity
+            android:name=".JobSeekerPart.OtherApplicantProfile"
+            android:exported="false" />
         <activity
             android:name=".EmployerPart.CandidateDetailActivity"
             android:exported="false" />
@@ -34,13 +45,14 @@
             android:name=".Settings.Settings"
             android:exported="false" />
         <activity
-            android:name=".ChatActivity"
+            android:name=".commonActivities.ChatActivity"
+            android:windowSoftInputMode="adjustResize"
             android:exported="false" />
         <activity
-            android:name=".JobDetailActivity"
+            android:name=".commonActivities.JobDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".JobListActivity"
+            android:name=".commonActivities.JobListActivity"
             android:exported="false" />
         <activity
             android:name=".EmployerPart.AddJobActivity"
@@ -50,9 +62,6 @@
             android:exported="false" />
         <activity
             android:name=".EmployerPart.RecruiterJobList"
-            android:exported="false" />
-        <activity
-            android:name=".HomeActivity"
             android:exported="false" />
         <activity
             android:name=".LoginRegistration.RegistrationActivity"
@@ -66,6 +75,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".data_Model.MyFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

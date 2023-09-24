@@ -1,7 +1,6 @@
 package com.example.myjobportalapplication.EmployerPart;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -17,20 +16,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.myjobportalapplication.JobDetailActivity;
-import com.example.myjobportalapplication.JobListActivity;
 import com.example.myjobportalapplication.R;
 import com.example.myjobportalapplication.data_Model.Data;
+import com.example.myjobportalapplication.data_Model.applicantData;
 import com.example.myjobportalapplication.uiDrawer.uiDrawer;
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -42,6 +36,8 @@ public class candidateActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private ArrayList<String> jobTitle;
     private ArrayList<String> numbApplicants;
+    private ArrayList<String> jobID = new ArrayList<>();
+    int candidatesWithData = 0;
     private String uId;
     uiDrawer UIDRAWER = new uiDrawer();
     @Override
@@ -74,7 +70,6 @@ public class candidateActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         UIDRAWER.myuiDrawer(this, mAuth, 0);
-
     }
 
     protected void onStart(){
@@ -85,16 +80,17 @@ public class candidateActivity extends AppCompatActivity {
         mCandidateList.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for(DataSnapshot candidateSnapshot : snapshot.getChildren()){
-                    String candidateKey = candidateSnapshot.getKey();
-                    long childrenCount = candidateSnapshot.getChildrenCount();
+                for(DataSnapshot jobSnapshot : snapshot.getChildren()){
+                    String jobKey = jobSnapshot.getKey();
+                    long childrenCount = jobSnapshot.getChildrenCount();
                     numbApplicants.add(String.valueOf(childrenCount));
 
-                    DatabaseReference mJobTitle = FirebaseDatabase.getInstance().getReference().child("Job Post").child(uId).child("Recruiter Job Post").child(candidateKey);
+                    DatabaseReference mJobTitle = FirebaseDatabase.getInstance().getReference().child("Job Post").child(uId).child("Recruiter Job Post").child(jobKey);
                     mJobTitle.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             if(snapshot.exists()){
+                                jobID.add(snapshot.getValue(Data.class).getId());
                                 jobTitle.add(snapshot.getValue(Data.class).getTitle());
                             }
                             mAdapter myAdapter = new mAdapter(jobTitle, numbApplicants);
@@ -137,6 +133,62 @@ public class candidateActivity extends AppCompatActivity {
             String item2 = numbApplicant.get(position);
             holder.setJobTitle(item1);
             holder.setApplicant(item2);
+
+            holder.myTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ArrayList<String> candidateInfo = new ArrayList<>();
+                    ArrayList<String> candidateAge = new ArrayList<>();
+                    ArrayList<String> candidateName = new ArrayList<>();
+                    candidatesWithData = 0;
+
+                    DatabaseReference mCandidateKey = mCandidateList.child(jobID.get(holder.getAbsoluteAdapterPosition()));
+                    mCandidateKey.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            int totalCandidates = (int) snapshot.getChildrenCount();
+
+                            for(DataSnapshot candidateSnapshot : snapshot.getChildren()){
+                                String candidateID = candidateSnapshot.getKey();
+                                candidateInfo.add(candidateID);
+                                mCandidateKey.child(candidateID).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        System.out.println(snapshot.exists());
+                                        if (snapshot.exists()) {
+                                            applicantData data = snapshot.getValue(applicantData.class);
+                                            candidateAge.add(data.getApplicantAge());
+                                            candidateName.add(data.getApplicantName());
+                                            candidatesWithData ++;
+                                            System.out.println(candidateAge);
+
+                                            if (candidatesWithData == totalCandidates){
+                                                System.out.println(candidateAge);
+                                                Intent intent = new Intent(getApplicationContext(), CandidateDetailActivity.class);
+                                                intent.putStringArrayListExtra("candidateAge", candidateAge);
+                                                intent.putStringArrayListExtra("candidateName", candidateName);
+                                                intent.putStringArrayListExtra("candidateKey", candidateInfo);
+                                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                                startActivity(intent);
+                                            }
+                                        }
+
+                                    }
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                    }
+                                });
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+                }
+            });
         }
 
         @Override

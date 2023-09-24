@@ -16,8 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.myjobportalapplication.EmployerPart.RecruiterJobList;
-import com.example.myjobportalapplication.JobDetailActivity;
+import com.example.myjobportalapplication.commonActivities.JobDetailActivity;
 import com.example.myjobportalapplication.R;
 import com.example.myjobportalapplication.data_Model.Data;
 import com.example.myjobportalapplication.uiDrawer.uiDrawer;

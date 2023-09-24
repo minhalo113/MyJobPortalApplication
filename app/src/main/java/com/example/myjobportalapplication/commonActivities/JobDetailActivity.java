@@ -1,8 +1,11 @@
-package com.example.myjobportalapplication;
+package com.example.myjobportalapplication.commonActivities;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -15,6 +18,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.myjobportalapplication.EmployerPart.OtherRecruiterProfile;
+import com.example.myjobportalapplication.R;
 import com.example.myjobportalapplication.data_Model.Data;
 import com.example.myjobportalapplication.data_Model.applicantData;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -55,6 +59,11 @@ public class JobDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_job_detail);
+
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
+        WindowInsetsControllerCompat windowInsetsCompat = new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
+        windowInsetsCompat.hide(WindowInsetsCompat.Type.statusBars());
+        windowInsetsCompat.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
