@@ -3,7 +3,6 @@ package com.example.myjobportalapplication.commonActivities;
 import static com.google.common.primitives.UnsignedInts.max;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
@@ -28,10 +27,8 @@ import com.example.myjobportalapplication.data_Model.chatMessage;
 import com.example.myjobportalapplication.databinding.ActivityChatListBinding;
 import com.example.myjobportalapplication.listenerInterface.ConversionListener;
 import com.example.myjobportalapplication.uiDrawer.uiDrawer;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -41,7 +38,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
-public class ChatList extends AppCompatActivity implements ConversionListener {
+public class ChatList extends BaseActivity implements ConversionListener {
     private StorageReference mStorage;
     private StorageReference appStorage;
     private FirebaseAuth mAuth;

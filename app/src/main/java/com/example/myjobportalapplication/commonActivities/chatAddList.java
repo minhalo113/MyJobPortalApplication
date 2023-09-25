@@ -32,7 +32,7 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 
-public class chatAddList extends AppCompatActivity {
+public class chatAddList extends BaseActivity {
     ProgressBar mProgressBar;
     private TextView errorMess;
     private RecyclerView mRecyclerView;

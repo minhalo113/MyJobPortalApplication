@@ -1,7 +1,6 @@
 package com.example.myjobportalapplication.commonActivities;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
@@ -14,10 +13,14 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.myjobportalapplication.Adapter.chatAdapter;
+import com.example.myjobportalapplication.data_Model.Constants;
 import com.example.myjobportalapplication.data_Model.chatMessage;
 import com.example.myjobportalapplication.databinding.ActivityChatBinding;
+import com.example.myjobportalapplication.network.ApiClient;
+import com.example.myjobportalapplication.network.ApiService;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -31,17 +34,27 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Objects;
 
-public class ChatActivity extends AppCompatActivity {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class ChatActivity extends BaseActivity {
     private ActivityChatBinding binding;
     private String userID;
     private String receiverName;
+    private String FCM_TOKEN_receiver, FCM_TOKEN_sender;
     private DocumentReference documentReference;
     private DocumentReference recruiterInfo;
     private FirebaseFirestore databaseChat;
@@ -50,6 +63,7 @@ public class ChatActivity extends AppCompatActivity {
     private ArrayList<chatMessage> chatMessages;
     private String conversionId = null;
     private com.example.myjobportalapplication.Adapter.chatAdapter chatAdapter;
+    private Boolean isReceiverAvailable= false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,6 +120,7 @@ public class ChatActivity extends AppCompatActivity {
                     DocumentSnapshot document = task.getResult();
                     if(document.exists()){
                         name[0] = document.getString("name");
+                        FCM_TOKEN_sender = document.getString("FCM TOKEN");
                         if(conversionId != null){
                             updateConversion(binding.inputMessage.getText().toString());
                         }else{
@@ -118,13 +133,92 @@ public class ChatActivity extends AppCompatActivity {
                             conversion.put("time", new Date());
                             addConversion(conversion);
                         }
-                        binding.inputMessage.setText(null);
+                        if(!isReceiverAvailable){
+                            try{
+                            JSONArray tokens = new JSONArray();
+                            tokens.put(FCM_TOKEN_receiver);
+                            JSONObject data = new JSONObject();
+                            data.put("userID", mAuth.getCurrentUser().getUid());
+                            data.put("name", name[0]);
+                            data.put("FCM TOKEN", FCM_TOKEN_sender);
+                            data.put("message", binding.inputMessage.getText().toString());
+
+                            JSONObject body = new JSONObject();
+                            body.put(Constants.REMOTE_MSG_DATA, data);
+                            body.put(Constants.REMOTE_MSG_REGISTRATION_IDS, tokens);
+
+                            sendNotification(body.toString());
+                            }catch(Exception exception){
+                                showToast(exception.getMessage());
+                            }
+                        }
                     }
+                    binding.inputMessage.setText(null);
                 }
             }
         });
     }
 
+    private void showToast(String message){
+        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+    }
+
+    private void sendNotification(String messageBody){
+        ApiClient.getClient().create(ApiService.class).sendMessage(
+                Constants.getRemoteMsgHeaders(),
+                messageBody
+        ).enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
+                if(response.isSuccessful()){
+                    try {
+                        if(response.body()!= null){
+                            JSONObject responseJson = new JSONObject(response.body());
+                            JSONArray results = responseJson.getJSONArray("results");
+                            if(responseJson.getInt("failure") == 1){
+                                JSONObject error = (JSONObject) results.get(0);
+                                showToast(error.getString("error"));
+                                return;
+                            }
+                        }
+                    }catch (JSONException e){
+                        e.printStackTrace();
+                    }
+                    showToast("Notification sent successful");
+                }else{
+                    showToast("Error: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
+                showToast(t.getMessage());
+            }
+        });
+    }
+    private void listenAvailabilityOfReceiver(){
+        databaseChat.collection("Job Applicants").document(
+                userID
+        ).addSnapshotListener(ChatActivity.this, (value, error) -> {
+            if(error != null){
+                return;
+            }
+            if(value != null){
+                if(value.getLong("availability") != null){
+                    int availability = Objects.requireNonNull(
+                            value.getLong("availability")
+                    ).intValue();
+                    isReceiverAvailable = availability == 1;
+                }
+                String receiverFCM = value.getString("FCM TOKEN");
+            }
+            if(isReceiverAvailable){
+                binding.textAvailabilitty.setVisibility(View.VISIBLE);
+            }else{
+                binding.textAvailabilitty.setVisibility(View.GONE);
+            }
+        });
+    }
     private void listenMessages(){
         databaseChat.collection("Recruiter -> Applicant (Chat)")
                 .whereEqualTo("senderID", mAuth.getCurrentUser().getUid())
@@ -173,6 +267,7 @@ public class ChatActivity extends AppCompatActivity {
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         if (documentSnapshot.exists()) {
                             receiverName = documentSnapshot.getString("name");
+                            FCM_TOKEN_receiver = documentSnapshot.getString("FCM TOKEN");
                             binding.textName.setText(receiverName);
                         }
                     }
@@ -221,6 +316,13 @@ public class ChatActivity extends AppCompatActivity {
             conversionId = documentSnapshot.getId();
         }
     };
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        listenAvailabilityOfReceiver();
+    }
+
     private String getReadableDateTime(Date date){
         return new SimpleDateFormat("MMMM dd, yyyy - hh:mm a", Locale.getDefault()).format(date);
     }
