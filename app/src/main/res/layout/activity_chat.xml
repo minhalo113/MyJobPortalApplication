@@ -40,6 +40,24 @@
                 android:src="@drawable/baseline_person_24"></androidx.appcompat.widget.AppCompatImageView>
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight = "0.4"
+            android:orientation="horizontal">
+            <TextView
+                android:id = "@+id/textAvailabilitty"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#008000"
+                android:textSize="@dimen/_10ssp"
+                android:textColor="@color/white"
+                android:padding="@dimen/_2sdp"
+                android:text = "Online"
+                android:gravity = "center"
+                android:visibility="gone"></TextView>
+
+        </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/chatRecyclerView"

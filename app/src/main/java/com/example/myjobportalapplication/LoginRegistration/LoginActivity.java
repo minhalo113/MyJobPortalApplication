@@ -173,6 +173,7 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
     private void updateToken(String token, String uId){
+        //preferenceManager.putString("FCM TOKEN", token);
         FirebaseFirestore database = FirebaseFirestore.getInstance();
         DocumentReference documentReference = database.collection("Job Applicant").document(uId);
         documentReference.update("FCM TOKEN", token).addOnSuccessListener(new OnSuccessListener<Void>() {
