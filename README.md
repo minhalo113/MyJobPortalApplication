@@ -2,32 +2,30 @@ Android Job Portal System
 
 # Background/ Problem Statement
 
-- An employment portal is an application that facilitates the search for employment and ranges from large, generalized sites to specialized working groups for work categories such as engineering, law, insurance, social work, teaching, and developing mobile applications. 
-- Users can usually submit their resumes and send them to potential employers and recruiters for review, while employers and recruiters can post job postings and search for potential employees. Niche job directories begin to play a bigger role in providing jobs and employees with more goals for the candidate or employer.
-- Our android-based Job Portal System will provide a very specific way to eliminate and reduce the time for the most appropriate role. The determination is to allow communication between the interested parties and complete the task of recruitment quickly.
+In the modern employment landscape, job portals play a crucial role in connecting job seekers with potential employers across various industries. From engineering to teaching, these platforms facilitate the exchange of resumes and job postings, streamlining the recruitment process. The Android-based Job Portal System aims to enhance this experience by providing a specialized platform to efficiently match candidates with their ideal roles, fostering quick and effective communication between job seekers and recruiters.
 
 # Working of the Project
 
-- Recruitment is often reported in the literature as the process of analyzing the job requirements, pooling together a network of qualified candidates, and hiring the best-fit person for the role in order to gain a competitive advantage. Selection is the process of choosing the best-fit person for the role from the generated pool of qualified candidates. 
-- A job portal is a platform dedicated to online information about recruiters as well as job seekers. A job portal helps both job seekers and recruiters find the right organization for the employees. In the case of job seekers, according to their educational qualification, experience, and their preferences, the job portal shows the list of companies to the job seeker. And, to the recruiters, provides the suitable candidates from a pool of lacks. 
-- The objective of the Job Portal System is to develop a system to enable interaction between employers and applicants. In this project, the front-end involves XML, Android-Java and the back-end involves MSSQL. The IDE used is Android Studio. 
+Recruitment involves the intricate process of analyzing job requirements, identifying qualified candidates, and selecting the best-fit person for a role. The Android Job Portal System is designed to serve as a dedicated platform for online recruitment information, benefiting both job seekers and recruiters. Job seekers can explore a curated list of organizations based on their qualifications and preferences, while recruiters can access a pool of qualified candidates. The system leverages XML and Android-Java for the front-end, MSSQL for the back-end, and is developed using the Android Studio IDE.
 
 # System Description
-- The system comprises 2 major modules with their sub-modules as follows: 
-- USER:
-- Registration: The user will need to register their account to log in.
-- Login: They can log in using a username and a password.
-- Profile: The user can add and update their personal details on their profile page. They will also need to add work experience, and key skills, and upload a CV. Also, they can change their old password to the new one.
-- Home: The user can search for jobs and also the system will automatically search for jobs as per the skills and recruiter conditions. They can view job details. And apply for their desired job.
-- Applied: View all the previous jobs that they have applied for. Chat with the recruiter for the jobs applied.
-- Chats: The user can view all their recent chats with the recruiter and also the chat page.
+- The system comprises 2 major modules with their sub-modules as follows:
+  
+- **USER**:
+  
+- Registration: Users need to register an account for access.
+- Login: Secure login with a username and password.
+- Profile: Users can manage personal details, work experience, key skills, and upload a CV. Password updates are also facilitated.
+- Home: Search and apply for jobs based on skills and recruiter conditions. View job details and applied jobs. Initiate chats with recruiters.
+- Applied: View a history of applied jobs. Engage in conversations with recruiters.
+- Chats: Review recent chats with recruiters and access the chat page.
+  
+- **RECRUITER**:
 
-- RECRUITER:
-
-- Registration: The recruiter will need to register their account to log in.
-- Login: They can log in using a username and a password.
-- Profile: The recruiter can add and update their details on their profile page. Change password. Also, they can change their old password to the new one.
-- Manage Jobs: The recruiter will be able to manage jobs and they can add, update, view and delete jobs. They can add all the details about jobs, company details. The recruiter can add company details on the job portal. They can view candidates and apply auto search with all the parameters added for a job such as experience, skills, salary and notice period.The recruiter can also chat with candidates.
-- Candidates: The recruiter can manually search for candidates. Name, experience, skills salary and notice period. They can also chat with the candidates.
-- Applied List: The recruiter can view the list of all the candidates that applied and their details.They can chat with candidates.
-- Chats: The recruiter can view their chat list and chat page
+- Registration:  Recruiters need to register an account for access.
+- Login:  Secure login with a username and password.
+- Profile: Recruiters can manage personal details and change passwords.
+- Manage Jobs: Recruiters can add, update, view, and delete jobs. They can include comprehensive details about jobs, manage company information, and conduct auto searches for candidates based on parameters like experience, skills, salary, and notice period. Recruiters can also engage in chats with candidates.
+- Candidates: Recruiters can manually search for candidates based on name, experience, skills, salary, and notice period. Chat functionality is also available.
+- Applied List: View a list of candidates who have applied, along with their details. Recruiters can engage in chats with candidates.
+- Chats: Recruiters can access their chat list and engage in conversations with candidates.
